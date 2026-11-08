@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Card,
@@ -13,8 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
-  Store,
   Lock,
   Mail,
   Loader2,
@@ -25,10 +27,11 @@ import {
   UserCheck,
   Eye,
   EyeOff,
-  Sparkles,
+  Terminal,
 } from "lucide-react";
 
 export function LoginForm() {
+  const t = useTranslations("auth");
   const { user, isLoading, isSubmitting, error, login, logout } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -46,9 +49,9 @@ export function LoginForm() {
 
     try {
       const res = await login({ email: email.trim(), password });
-      setSuccessMsg(`Welcome back, ${res.user.name}!`);
+      setSuccessMsg(res.user.name);
     } catch {
-      // Error handled in useAuth hook
+      // Error is handled in useAuth hook
     }
   };
 
@@ -58,199 +61,198 @@ export function LoginForm() {
     setSuccessMsg(null);
   };
 
-  // If initial auth check is loading
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-3 text-sm text-muted-foreground">Checking active session...</p>
-      </div>
-    );
-  }
-
-  // If already authenticated, show logged-in profile card
-  if (user) {
-    return (
-      <Card className="w-full max-w-md shadow-lg border-primary/20">
-        <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <UserCheck className="h-6 w-6" />
-          </div>
-          <CardTitle className="text-xl font-bold tracking-tight">Active Terminal Session</CardTitle>
-          <CardDescription>
-            You are logged into POS Terminal
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 pt-2">
-          <div className="rounded-lg border bg-muted/40 p-4 space-y-2 text-sm">
-            <div className="flex justify-between items-center py-1 border-b border-border/50">
-              <span className="text-muted-foreground">Operator Name:</span>
-              <span className="font-semibold">{user.name}</span>
-            </div>
-            <div className="flex justify-between items-center py-1 border-b border-border/50">
-              <span className="text-muted-foreground">Email:</span>
-              <span className="font-mono text-xs">{user.email}</span>
-            </div>
-            <div className="flex justify-between items-center py-1 border-b border-border/50">
-              <span className="text-muted-foreground">Role:</span>
-              <span className="inline-flex items-center gap-1 rounded bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                {user.role}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <span className="text-muted-foreground">Status:</span>
-              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium text-xs">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                {user.isActive ? "Online / Verified" : "Inactive"}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-2 pt-2">
-          <Button
-            variant="destructive"
-            className="w-full flex items-center justify-center gap-2 cursor-pointer"
-            onClick={logout}
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out & Clear Terminal
-          </Button>
-        </CardFooter>
-      </Card>
-    );
-  }
-
-  // Not logged in -> Show shadcn Login Form
   return (
-    <Card className="w-full max-w-md shadow-xl border-border/80">
-      <CardHeader className="space-y-1 text-center">
-        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
-          <Store className="h-6 w-6" />
+    <div className="w-full max-w-md mx-auto space-y-4">
+      {/* Top Utility Controls: Theme & Language */}
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium tracking-wide">
+          <Terminal className="h-3.5 w-3.5" />
+          <span>{t("terminalTitle")}</span>
         </div>
-        <CardTitle className="text-2xl font-bold tracking-tight">
-          POS Terminal Login
-        </CardTitle>
-        <CardDescription>
-          Enter your operator credentials to sign in
-        </CardDescription>
-      </CardHeader>
+        <div className="flex items-center gap-1.5">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4 pt-2">
-          {/* Error Message */}
-          {error && (
-            <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-              <span>{error}</span>
+      {isLoading ? (
+        <Card className="border-border">
+          <CardContent className="flex flex-col items-center justify-center py-14">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </CardContent>
+        </Card>
+      ) : user ? (
+        /* Authenticated Active Terminal View */
+        <Card className="border-border shadow-sm">
+          <CardHeader className="pb-3 text-center">
+            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <UserCheck className="h-5 w-5" />
             </div>
-          )}
-
-          {/* Success Message */}
-          {successMsg && (
-            <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="h-4 w-4 shrink-0" />
-              <span>{successMsg}</span>
+            <CardTitle className="text-lg font-semibold">{t("sessionActive")}</CardTitle>
+            <CardDescription className="text-xs">{t("sessionDescription")}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 pt-1">
+            <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 text-xs">
+              <div className="flex justify-between items-center py-0.5 border-b border-border/50">
+                <span className="text-muted-foreground">{t("operatorName")}</span>
+                <span className="font-medium text-foreground">{user.name}</span>
+              </div>
+              <div className="flex justify-between items-center py-0.5 border-b border-border/50">
+                <span className="text-muted-foreground">{t("operatorEmail")}</span>
+                <span className="font-mono text-foreground">{user.email}</span>
+              </div>
+              <div className="flex justify-between items-center py-0.5 border-b border-border/50">
+                <span className="text-muted-foreground">{t("operatorRole")}</span>
+                <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 font-medium text-primary">
+                  <ShieldCheck className="h-3 w-3" />
+                  {user.role}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-0.5">
+                <span className="text-muted-foreground">{t("terminalStatus")}</span>
+                <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  {t("statusOnline")}
+                </span>
+              </div>
             </div>
-          )}
+          </CardContent>
+          <CardFooter className="pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-destructive hover:text-destructive cursor-pointer"
+              onClick={logout}
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              {t("logoutButton")}
+            </Button>
+          </CardFooter>
+        </Card>
+      ) : (
+        /* Unauthenticated Clean Sign In Form */
+        <Card className="border-border shadow-sm">
+          <CardHeader className="space-y-1 pb-4 text-center">
+            <CardTitle className="text-xl font-semibold tracking-tight">
+              {t("loginTitle")}
+            </CardTitle>
+            <CardDescription className="text-xs">
+              {t("loginDescription")}
+            </CardDescription>
+          </CardHeader>
 
-          {/* Email Field */}
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Operator Email
-            </Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="operator@apexpos.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="pl-9"
-                autoComplete="email"
-              />
-            </div>
-          </div>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-3.5">
+              {/* Error Message */}
+              {error && (
+                <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
 
-          {/* Password Field */}
-          <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Security Password
-            </Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="pl-9 pr-9"
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground cursor-pointer"
-                aria-label="Toggle password visibility"
+              {/* Success Message */}
+              {successMsg && (
+                <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-2.5 text-xs text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                  <span>{successMsg}</span>
+                </div>
+              )}
+
+              {/* Operator Email Field */}
+              <div className="space-y-1">
+                <Label htmlFor="email" className="text-xs text-muted-foreground font-medium">
+                  {t("emailLabel")}
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder={t("emailPlaceholder")}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="pl-8 text-xs h-9"
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              {/* Security Password Field */}
+              <div className="space-y-1">
+                <Label htmlFor="password" className="text-xs text-muted-foreground font-medium">
+                  {t("passwordLabel")}
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder={t("passwordPlaceholder")}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pl-8 pr-8 text-xs h-9"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground cursor-pointer"
+                    aria-label={t("togglePassword")}
+                  >
+                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Test Credentials Helper */}
+              <div className="rounded-md border border-border/60 bg-muted/20 p-2 space-y-1.5">
+                <div className="text-[11px] text-muted-foreground font-medium">
+                  {t("quickFillTitle")}
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill("supervisor@apexpos.com", "password123")}
+                    className="rounded border border-border bg-background px-2 py-1 text-left hover:bg-accent transition cursor-pointer"
+                  >
+                    <div className="text-xs font-medium text-foreground">{t("supervisor")}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono truncate">supervisor@apexpos.com</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill("cashier@apexpos.com", "password123")}
+                    className="rounded border border-border bg-background px-2 py-1 text-left hover:bg-accent transition cursor-pointer"
+                  >
+                    <div className="text-xs font-medium text-foreground">{t("cashier")}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono truncate">cashier@apexpos.com</div>
+                  </button>
+                </div>
+              </div>
+            </CardContent>
+
+            <CardFooter className="pt-2 pb-4">
+              <Button
+                type="submit"
+                size="default"
+                className="w-full gap-2 cursor-pointer font-medium"
+                disabled={isSubmitting}
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Fill Demo Helper */}
-          <div className="rounded-lg border border-dashed border-border/80 bg-muted/30 p-2.5">
-            <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-              <span className="flex items-center gap-1 font-medium">
-                <Sparkles className="h-3 w-3 text-amber-500" />
-                Quick Test Credentials:
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickFill("supervisor@apexpos.com", "password123")}
-                className="text-left text-xs rounded border border-border bg-background px-2 py-1.5 hover:bg-accent transition cursor-pointer"
-              >
-                <div className="font-semibold text-foreground">Supervisor</div>
-                <div className="text-[10px] text-muted-foreground">supervisor@apexpos.com</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill("cashier@apexpos.com", "password123")}
-                className="text-left text-xs rounded border border-border bg-background px-2 py-1.5 hover:bg-accent transition cursor-pointer"
-              >
-                <div className="font-semibold text-foreground">Cashier</div>
-                <div className="text-[10px] text-muted-foreground">cashier@apexpos.com</div>
-              </button>
-            </div>
-          </div>
-        </CardContent>
-
-        <CardFooter className="flex flex-col gap-2 pt-2">
-          <Button
-            type="submit"
-            className="w-full flex items-center justify-center gap-2 cursor-pointer font-semibold"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Authenticating...
-              </>
-            ) : (
-              <>
-                <Store className="h-4 w-4" />
-                Sign In to Terminal
-              </>
-            )}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>{t("submittingButton")}</span>
+                  </>
+                ) : (
+                  <span>{t("submitButton")}</span>
+                )}
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      )}
+    </div>
   );
 }
