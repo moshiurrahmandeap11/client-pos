@@ -32,7 +32,9 @@ export function LanguageSwitcher() {
       aria-label="Switch language"
     >
       <Languages className={`h-3.5 w-3.5 transition-opacity ${isPending ? "opacity-50" : ""}`} />
-      <span>{locale === "en" ? "বাংলা" : "English"}</span>
+      <span className="w-12 text-center inline-block select-none">
+        {locale === "en" ? "বাংলা" : "English"}
+      </span>
     </Button>
   );
 }

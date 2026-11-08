@@ -50,15 +50,15 @@ export function LoginForm() {
       const res = await login({ email: email.trim(), password });
       setSuccessMsg(res.user.name);
     } catch {
-      // Handled in useAuth hook
+      // Error handled in useAuth hook
     }
   };
 
   return (
     <div className="w-full max-w-md mx-auto space-y-4">
       {/* Top Utility Controls: Title without icon, Language & Theme Toggle */}
-      <div className="flex items-center justify-between px-1">
-        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+      <div className="flex items-center justify-between px-1 h-8">
+        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase select-none">
           {t("terminalTitle")}
         </span>
         <div className="flex items-center gap-1.5">
@@ -68,10 +68,8 @@ export function LoginForm() {
       </div>
 
       {isLoading ? (
-        <Card className="border-border">
-          <CardContent className="flex flex-col items-center justify-center py-14">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </CardContent>
+        <Card className="border-border shadow-sm min-h-[320px] flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </Card>
       ) : user ? (
         /* Authenticated Active Terminal View */
@@ -80,8 +78,12 @@ export function LoginForm() {
             <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <UserCheck className="h-5 w-5" />
             </div>
-            <CardTitle className="text-lg font-semibold">{t("sessionActive")}</CardTitle>
-            <CardDescription className="text-xs">{t("sessionDescription")}</CardDescription>
+            <CardTitle className="text-lg font-semibold min-h-[26px] flex items-center justify-center">
+              {t("sessionActive")}
+            </CardTitle>
+            <CardDescription className="text-xs min-h-[16px]">
+              {t("sessionDescription")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 pt-1">
             <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 text-xs">
@@ -113,7 +115,7 @@ export function LoginForm() {
             <Button
               variant="outline"
               size="sm"
-              className="w-full gap-2 text-destructive hover:text-destructive cursor-pointer"
+              className="w-full gap-2 text-destructive hover:text-destructive cursor-pointer h-9"
               onClick={logout}
             >
               <LogOut className="h-3.5 w-3.5" />
@@ -125,10 +127,10 @@ export function LoginForm() {
         /* Unauthenticated Clean Sign In Form */
         <Card className="border-border shadow-sm">
           <CardHeader className="space-y-1 pb-4 text-center">
-            <CardTitle className="text-xl font-semibold tracking-tight">
+            <CardTitle className="text-xl font-semibold tracking-tight min-h-[28px] flex items-center justify-center">
               {t("loginTitle")}
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs min-h-[16px]">
               {t("loginDescription")}
             </CardDescription>
           </CardHeader>
@@ -153,7 +155,10 @@ export function LoginForm() {
 
               {/* Operator Email Field */}
               <div className="space-y-1">
-                <Label htmlFor="email" className="text-xs text-muted-foreground font-medium">
+                <Label
+                  htmlFor="email"
+                  className="text-xs text-muted-foreground font-medium block h-4 leading-none"
+                >
                   {t("emailLabel")}
                 </Label>
                 <div className="relative">
@@ -173,7 +178,10 @@ export function LoginForm() {
 
               {/* Security Password Field */}
               <div className="space-y-1">
-                <Label htmlFor="password" className="text-xs text-muted-foreground font-medium">
+                <Label
+                  htmlFor="password"
+                  className="text-xs text-muted-foreground font-medium block h-4 leading-none"
+                >
                   {t("passwordLabel")}
                 </Label>
                 <div className="relative">
@@ -204,7 +212,7 @@ export function LoginForm() {
               <Button
                 type="submit"
                 size="default"
-                className="w-full gap-2 cursor-pointer font-medium"
+                className="w-full gap-2 cursor-pointer font-medium h-9"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
