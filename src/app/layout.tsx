@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
+import { SettingsProvider } from "@/providers/SettingsProvider";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -40,7 +41,7 @@ const liAdorNoirrit = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "APEX Retail POS",
+  title: "POS Management Engine",
   description: "Enterprise Point of Sale & Terminal Management",
 };
 
@@ -64,7 +65,9 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <AuthProvider>{children}</AuthProvider>
+          <SettingsProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>

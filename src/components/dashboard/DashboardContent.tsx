@@ -3,6 +3,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
+import { useSettings } from "@/hooks/useSettings";
 import { SystemSettingsForm } from "./settings/SystemSettingsForm";
 import {
   Card,
@@ -15,6 +16,7 @@ import {
   Settings,
   ShieldCheck,
   CheckCircle2,
+  AlertTriangle,
   Monitor,
   Printer,
   Scale,
@@ -60,11 +62,23 @@ export function DashboardContent({
   const tAuth = useTranslations("auth");
   const tSettings = useTranslations("settingsMenu");
   const { user } = useAuth();
+  const { settings, currencySymbol, formatDate } = useSettings();
 
   // 1. DASHBOARD OVERVIEW VIEW (Full Width)
   if (activeView === "dashboard") {
     return (
       <div className="w-full space-y-6">
+        {/* Maintenance Mode Alert Banner if active */}
+        {settings?.maintenanceMode === "Yes" && (
+          <div className="w-full rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 flex items-center gap-3 text-xs text-amber-700 dark:text-amber-300 font-normal animate-in fade-in">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <div className="flex-1">
+              <span className="font-medium">Maintenance Mode is currently enabled.</span>
+              <span className="ml-1 text-muted-foreground">Store transactions are in administrative-only testing mode.</span>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-border/50">
           <div>
@@ -94,7 +108,7 @@ export function DashboardContent({
               </div>
             </div>
             <div className="text-xl font-normal text-foreground">
-              ৳48,650.00
+              {currencySymbol}48,650.00
             </div>
             <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-normal">
               +14.2% vs yesterday
@@ -128,7 +142,7 @@ export function DashboardContent({
               </div>
             </div>
             <div className="text-xl font-normal text-foreground">
-              ৳342.60
+              {currencySymbol}342.60
             </div>
             <p className="text-[11px] text-muted-foreground font-normal">
               3.8 items per basket
@@ -145,10 +159,10 @@ export function DashboardContent({
               </div>
             </div>
             <div className="text-xl font-normal text-foreground">
-              ৳18,200.00
+              {currencySymbol}18,200.00
             </div>
             <p className="text-[11px] text-muted-foreground font-normal">
-              Float: ৳5,000 + Cash: ৳13,200
+              Float: {currencySymbol}5,000 + Cash: {currencySymbol}13,200
             </p>
           </Card>
         </div>
@@ -199,21 +213,23 @@ export function DashboardContent({
           <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-              <CardTitle className="text-sm font-normal">Active Shift (Counter #01)</CardTitle>
+              <CardTitle className="text-sm font-normal">
+                Active Shift ({settings?.defaultWarehouse || "Main Branch"})
+              </CardTitle>
             </div>
             <span className="text-xs text-muted-foreground font-normal">
-              Started at 08:30 AM
+              Today: {formatDate(new Date())} • {settings?.timezone || "Asia/Dhaka"}
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs w-full">
             <div className="rounded-lg bg-muted/40 p-3 space-y-1">
               <span className="text-muted-foreground">Cashier On Duty</span>
-              <p className="text-foreground font-normal text-sm">{user?.name}</p>
+              <p className="text-foreground font-normal text-sm">{user?.name || "Operator"}</p>
             </div>
             <div className="rounded-lg bg-muted/40 p-3 space-y-1">
-              <span className="text-muted-foreground">Assigned Role</span>
-              <p className="text-foreground font-normal text-sm">{user?.roleDisplayName || user?.role}</p>
+              <span className="text-muted-foreground">Default Accounting Method</span>
+              <p className="text-foreground font-normal text-sm">{settings?.accountingMethod || "AVCO"}</p>
             </div>
             <div className="rounded-lg bg-muted/40 p-3 space-y-1">
               <span className="text-muted-foreground">Offline Sync Engine</span>
@@ -303,69 +319,69 @@ export function DashboardContent({
         return {
           title: tSettings("addPrinter"),
           icon: PrinterCheck,
-          description: "Register a new receipt or kitchen thermal printer with baud rate, paper width (58mm/80mm), and IP port.",
+          description: "Register a new POS thermal receipt or barcode label printer with baud rates and driver profiles.",
         };
       case "currencies":
         return {
           title: tSettings("currencies"),
           icon: CircleDollarSign,
-          description: "Configure base store currency (BDT ৳), symbol positioning, decimal precision, and exchange rates.",
+          description: "Manage exchange rates, multi-currency cash tender options, and rounding precision thresholds.",
         };
       case "customer-groups":
         return {
           title: tSettings("customerGroups"),
           icon: Users,
-          description: "Group retail customers (Regular, VIP, Wholesale, Corporate) with tier-based automated discounts.",
+          description: "Segment customer cohorts for targeted discount tiers, credit limits, and promotional offers.",
         };
       case "price-groups":
         return {
           title: tSettings("priceGroups"),
           icon: Tag,
-          description: "Set up multi-tier pricing strategies (Retail Counter, Wholesale Bulk, Distributor Special).",
+          description: "Set customer price lists (Retail, Wholesale, Distributor) and volume markdown schedules.",
         };
       case "variants":
         return {
           title: tSettings("variants"),
           icon: Layers,
-          description: "Manage product variant attributes (Size, Color, Flavor, Material, Weight) with barcode suffixes.",
+          description: "Configure SKU attributes such as Color, Size, Flavor, Material, and barcode child item matrix.",
         };
       case "email-templates":
         return {
           title: tSettings("emailTemplates"),
           icon: Mail,
-          description: "Customize automated digital invoice emails, order receipts, purchase orders, and customer alerts.",
+          description: "Design automated customer notification emails, digital e-receipts, and staff shift summaries.",
         };
       case "site-logs":
         return {
           title: tSettings("siteLogs"),
           icon: FileCode,
-          description: "Audit trail of operator transactions, supervisor PIN overrides, financial adjustments, and errors.",
+          description: "Inspect immutable system audit trail, security events, cash drawer openings, and price overrides.",
         };
       case "backups":
         return {
           title: tSettings("backups"),
           icon: DatabaseBackup,
-          description: "Create manual database snapshots, configure scheduled cloud backups, and restore archive points.",
+          description: "Trigger real-time PostgreSQL database snapshot backups and schedule cloud storage replication.",
         };
       default:
         return {
-          title: tSettings("systemSettings"),
+          title: activeSubTab,
           icon: Sliders,
-          description: "Global POS engine configuration, timezone, localization, and station defaults.",
+          description: "Manage and configure settings module parameters.",
         };
     }
   };
 
   const currentTab = getSubTabDetails();
-  const TabIcon = currentTab.icon;
+  const CurrentIcon = currentTab.icon;
 
   return (
     <div className="w-full space-y-6">
-      {/* Submenu Section Header */}
+      {/* Module Title Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-border/50">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <TabIcon className="h-5 w-5" />
+            <CurrentIcon className="h-5 w-5" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-normal text-foreground tracking-tight">
@@ -376,94 +392,20 @@ export function DashboardContent({
             </p>
           </div>
         </div>
-
-        <div className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-muted-foreground font-normal">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-          <span>Section: {activeSubTab || "system-settings"}</span>
-        </div>
       </div>
 
-      {/* Main Settings Panel Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-        {/* Card 1: Configuration Status */}
-        <Card className="border-border bg-card p-4 sm:p-5 space-y-3 shadow-xs">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-foreground">
-              <TabIcon className="h-4 w-4" />
-            </div>
+      {/* Module Workspace Container */}
+      <div className="space-y-4 w-full">
+        <Card className="border-border bg-card p-5 sm:p-6 space-y-5 shadow-xs w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border/50">
             <div>
-              <CardTitle className="text-sm font-normal">Module Status</CardTitle>
-              <CardDescription className="text-xs font-normal">Ready & Active</CardDescription>
+              <h2 className="text-sm font-normal text-foreground">
+                {currentTab.title} Registry
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Operational records and configuration parameters currently active on this station.
+              </p>
             </div>
-          </div>
-          <div className="text-xs text-muted-foreground pt-1 space-y-1.5 border-t border-border/50">
-            <div className="flex justify-between">
-              <span>Station ID</span>
-              <span className="font-mono text-foreground font-normal">#POS-01</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Configuration State</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-normal">Synchronized</span>
-            </div>
-          </div>
-        </Card>
-
-        {/* Card 2: Hardware & Peripheral Interfacing */}
-        <Card className="border-border bg-card p-4 sm:p-5 space-y-3 shadow-xs">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-foreground">
-              <Printer className="h-4 w-4" />
-            </div>
-            <div>
-              <CardTitle className="text-sm font-normal">Hardware Interface</CardTitle>
-              <CardDescription className="text-xs font-normal">Thermal Printer & Scale</CardDescription>
-            </div>
-          </div>
-          <div className="text-xs text-muted-foreground pt-1 space-y-1.5 border-t border-border/50">
-            <div className="flex justify-between">
-              <span>Thermal Receipt (ESC/POS)</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-normal">80mm Ready</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Drawer Kick Pulse</span>
-              <span className="text-foreground font-normal">Enabled</span>
-            </div>
-          </div>
-        </Card>
-
-        {/* Card 3: Storage & Database Sync */}
-        <Card className="border-border bg-card p-4 sm:p-5 space-y-3 shadow-xs">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted text-foreground">
-              <DatabaseBackup className="h-4 w-4" />
-            </div>
-            <div>
-              <CardTitle className="text-sm font-normal">Database Connection</CardTitle>
-              <CardDescription className="text-xs font-normal">PostgreSQL VPS</CardDescription>
-            </div>
-          </div>
-          <div className="text-xs text-muted-foreground pt-1 space-y-1.5 border-t border-border/50">
-            <div className="flex justify-between">
-              <span>Remote VPS Host</span>
-              <span className="font-mono text-foreground font-normal">103.71.47.73</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Latency</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-normal">&lt; 38ms</span>
-            </div>
-          </div>
-        </Card>
-
-        {/* Card 4: Action Controls tailored to current tab */}
-        <Card className="border-border bg-card p-4 sm:p-5 space-y-3 shadow-xs sm:col-span-2 lg:col-span-3 w-full">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/50 pb-3">
-            <div>
-              <CardTitle className="text-sm font-normal">Manage {currentTab.title}</CardTitle>
-              <CardDescription className="text-xs font-normal">
-                Perform administrative adjustments for this setting domain.
-              </CardDescription>
-            </div>
-
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -471,11 +413,9 @@ export function DashboardContent({
                 className="gap-1.5 text-xs font-normal cursor-pointer"
               >
                 <Download className="h-3.5 w-3.5" />
-                <span>Export Configuration</span>
+                <span>Export Schema</span>
               </Button>
-
               <Button
-                variant="default"
                 size="sm"
                 className="gap-1.5 text-xs font-normal cursor-pointer"
               >

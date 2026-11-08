@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSettings } from "@/hooks/useSettings";
 import { useTranslations } from "next-intl";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -33,6 +34,7 @@ interface TerminalAppProps {
 export function TerminalApp({ initialView, settingsTab }: TerminalAppProps) {
   const t = useTranslations("auth");
   const { user, isLoading, isSubmitting, error, login } = useAuth();
+  const { settings } = useSettings();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -148,7 +150,7 @@ export function TerminalApp({ initialView, settingsTab }: TerminalAppProps) {
             {/* Top Utility Controls */}
             <div className="flex items-center justify-between pb-3 h-8 border-b border-border/40 mb-4">
               <span className="text-xs font-normal tracking-wider text-muted-foreground uppercase select-none">
-                {t("terminalTitle")}
+                {settings?.siteName || t("terminalTitle")}
               </span>
               <div className="flex items-center gap-1.5">
                 <LanguageSwitcher />

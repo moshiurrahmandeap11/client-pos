@@ -2,10 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import {
-  settingsService,
-  SystemSettingsData,
-} from "@/services/settings.service";
+import { useSettings } from "@/hooks/useSettings";
+import { SystemSettingsData } from "@/services/settings.service";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,60 +19,21 @@ import {
 
 export function SystemSettingsForm() {
   const t = useTranslations("settingsMenu");
+  const { settings, updateSettings, isLoading: isContextLoading } = useSettings();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Form State
-  const [formData, setFormData] = useState<SystemSettingsData>({
-    siteName: "Sunshine IT",
-    language: "English",
-    defaultCurrency: "BDT",
-    accountingMethod: "AVCO (Average Cost Method)",
-    defaultEmail: "sunshine.com.bd@gmail.com",
-    defaultCustomerGroup: "General",
-    defaultPriceGroup: "Default",
-    maintenanceMode: "No",
-    theme: "Default",
-    rtlSupport: "Disable",
-    loginCaptcha: "Disable",
-    numberDaysDisableEditing: 0,
-    rowsPerPage: 10,
-    dateFormat: "dd-mm-yyyy",
-    timezone: "Asia/Dhaka",
-    calender: "Shared",
-    defaultWarehouse: "Uth (1)",
-    defaultBiller: "Sunshine IT",
-    pdfLibrary: "mPDF",
-    useCodeForSlug: "Enable",
-  });
+  // Form State initialized from global context settings
+  const [formData, setFormData] = useState<SystemSettingsData>(settings);
 
-  // Fetch initial settings from backend API
+  // Synchronize local form whenever global settings change
   useEffect(() => {
-    let isMounted = true;
-    async function fetchSettings() {
-      try {
-        setIsLoading(true);
-        const data = await settingsService.getSystemSettings();
-        if (isMounted && data) {
-          setFormData((prev) => ({
-            ...prev,
-            ...data,
-          }));
-        }
-      } catch (err: any) {
-        console.error("Failed to load system settings:", err);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
+    if (settings) {
+      setFormData(settings);
     }
-    fetchSettings();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  }, [settings]);
 
   const handleChange = (
     field: keyof SystemSettingsData,
@@ -95,7 +54,7 @@ export function SystemSettingsForm() {
     setErrorMessage(null);
 
     try {
-      const updated = await settingsService.updateSystemSettings({
+      const updated = await updateSettings({
         ...formData,
         numberDaysDisableEditing: Number(formData.numberDaysDisableEditing) || 0,
         rowsPerPage: Number(formData.rowsPerPage) || 10,
@@ -109,7 +68,7 @@ export function SystemSettingsForm() {
     }
   };
 
-  if (isLoading) {
+  if (isContextLoading && !formData.siteName) {
     return (
       <Card className="w-full border-border bg-card p-10 flex flex-col items-center justify-center space-y-3">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -141,34 +100,23 @@ export function SystemSettingsForm() {
             </p>
           </div>
         </div>
-
-        <div className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-muted-foreground font-normal">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          <span>Active Configuration</span>
-        </div>
       </div>
 
-      {/* Form Container - Full Width */}
+      {/* Notifications */}
+      {successMessage && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-xs text-emerald-600 dark:text-emerald-400 font-normal animate-in fade-in">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <span>{successMessage}</span>
+        </div>
+      )}
+
+      {errorSourceMessage(errorMessage)}
+
+      {/* Settings Form Grid - Full Width & Fully Responsive */}
       <form onSubmit={handleSubmit} className="w-full space-y-6">
-        {/* Alerts */}
-        {successMessage && (
-          <div className="w-full flex items-center gap-2.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-xs text-emerald-600 dark:text-emerald-400 font-normal animate-in fade-in">
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-            <span>{successMessage}</span>
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="w-full flex items-center gap-2.5 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive font-normal animate-in fade-in">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        <Card className="w-full border-border bg-card p-5 sm:p-7 shadow-xs space-y-6">
-          {/* 3-Column Responsive Grid (Full width) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 w-full">
-            {/* 1. Site Name * */}
+        <Card className="border-border bg-card p-5 sm:p-6 space-y-6 shadow-xs w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+            {/* 1. Site Name */}
             <div className="space-y-1.5">
               <Label htmlFor="siteName" className="text-xs font-normal text-foreground">
                 Site Name <span className="text-destructive">*</span>
@@ -177,13 +125,13 @@ export function SystemSettingsForm() {
                 id="siteName"
                 value={formData.siteName}
                 onChange={(e) => handleChange("siteName", e.target.value)}
+                placeholder="e.g. Sunshine IT"
                 required
-                className="h-9 text-xs font-normal"
-                placeholder="Sunshine IT"
+                className="text-xs h-9 font-normal"
               />
             </div>
 
-            {/* 2. Language * */}
+            {/* 2. Language */}
             <div className="space-y-1.5">
               <Label htmlFor="language" className="text-xs font-normal text-foreground">
                 Language <span className="text-destructive">*</span>
@@ -196,11 +144,11 @@ export function SystemSettingsForm() {
               >
                 <option value="English">English</option>
                 <option value="Bengali">Bengali (বাংলা)</option>
-                <option value="Arabic">Arabic</option>
+                <option value="Arabic">Arabic (العربية)</option>
               </select>
             </div>
 
-            {/* 3. Default Currency * */}
+            {/* 3. Default Currency */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultCurrency" className="text-xs font-normal text-foreground">
                 Default Currency <span className="text-destructive">*</span>
@@ -211,16 +159,17 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("defaultCurrency", e.target.value)}
                 className={selectClassName}
               >
-                <option value="BDT">BDT (৳)</option>
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="SAR">SAR</option>
-                <option value="AED">AED</option>
+                <option value="BDT">BDT (৳ - Bangladeshi Taka)</option>
+                <option value="USD">USD ($ - US Dollar)</option>
+                <option value="EUR">EUR (€ - Euro)</option>
+                <option value="GBP">GBP (£ - British Pound)</option>
+                <option value="INR">INR (₹ - Indian Rupee)</option>
+                <option value="SAR">SAR (﷼ - Saudi Riyal)</option>
+                <option value="AED">AED (د.إ - UAE Dirham)</option>
               </select>
             </div>
 
-            {/* 4. Accounting Method * */}
+            {/* 4. Accounting Method */}
             <div className="space-y-1.5">
               <Label htmlFor="accountingMethod" className="text-xs font-normal text-foreground">
                 Accounting Method <span className="text-destructive">*</span>
@@ -237,7 +186,7 @@ export function SystemSettingsForm() {
               </select>
             </div>
 
-            {/* 5. Default Email * */}
+            {/* 5. Default Email */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultEmail" className="text-xs font-normal text-foreground">
                 Default Email <span className="text-destructive">*</span>
@@ -247,13 +196,13 @@ export function SystemSettingsForm() {
                 type="email"
                 value={formData.defaultEmail}
                 onChange={(e) => handleChange("defaultEmail", e.target.value)}
+                placeholder="e.g. info@domain.com"
                 required
-                className="h-9 text-xs font-normal"
-                placeholder="sunshine.com.bd@gmail.com"
+                className="text-xs h-9 font-normal"
               />
             </div>
 
-            {/* 6. Default Customer Group * */}
+            {/* 6. Default Customer Group */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultCustomerGroup" className="text-xs font-normal text-foreground">
                 Default Customer Group <span className="text-destructive">*</span>
@@ -265,13 +214,13 @@ export function SystemSettingsForm() {
                 className={selectClassName}
               >
                 <option value="General">General</option>
-                <option value="VIP">VIP</option>
+                <option value="Retail">Retail</option>
                 <option value="Wholesale">Wholesale</option>
-                <option value="Corporate">Corporate</option>
+                <option value="VIP">VIP</option>
               </select>
             </div>
 
-            {/* 7. Default Price Group * */}
+            {/* 7. Default Price Group */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultPriceGroup" className="text-xs font-normal text-foreground">
                 Default Price Group <span className="text-destructive">*</span>
@@ -283,13 +232,12 @@ export function SystemSettingsForm() {
                 className={selectClassName}
               >
                 <option value="Default">Default</option>
-                <option value="Retail Counter">Retail Counter</option>
-                <option value="Wholesale Bulk">Wholesale Bulk</option>
-                <option value="Distributor Special">Distributor Special</option>
+                <option value="Retail Tier 1">Retail Tier 1</option>
+                <option value="Wholesale Tier 2">Wholesale Tier 2</option>
               </select>
             </div>
 
-            {/* 8. Maintenance Mode * */}
+            {/* 8. Maintenance Mode */}
             <div className="space-y-1.5">
               <Label htmlFor="maintenanceMode" className="text-xs font-normal text-foreground">
                 Maintenance Mode <span className="text-destructive">*</span>
@@ -305,7 +253,7 @@ export function SystemSettingsForm() {
               </select>
             </div>
 
-            {/* 9. Theme * */}
+            {/* 9. Theme */}
             <div className="space-y-1.5">
               <Label htmlFor="theme" className="text-xs font-normal text-foreground">
                 Theme <span className="text-destructive">*</span>
@@ -322,7 +270,7 @@ export function SystemSettingsForm() {
               </select>
             </div>
 
-            {/* 10. RTL Support * */}
+            {/* 10. RTL Support */}
             <div className="space-y-1.5">
               <Label htmlFor="rtlSupport" className="text-xs font-normal text-foreground">
                 RTL Support <span className="text-destructive">*</span>
@@ -338,7 +286,7 @@ export function SystemSettingsForm() {
               </select>
             </div>
 
-            {/* 11. Login Captcha * */}
+            {/* 11. Login Captcha */}
             <div className="space-y-1.5">
               <Label htmlFor="loginCaptcha" className="text-xs font-normal text-foreground">
                 Login Captcha <span className="text-destructive">*</span>
@@ -354,7 +302,7 @@ export function SystemSettingsForm() {
               </select>
             </div>
 
-            {/* 12. Number of days to disable editing * */}
+            {/* 12. Number of days to disable editing */}
             <div className="space-y-1.5">
               <Label htmlFor="numberDaysDisableEditing" className="text-xs font-normal text-foreground">
                 Number of days to disable editing <span className="text-destructive">*</span>
@@ -364,14 +312,13 @@ export function SystemSettingsForm() {
                 type="number"
                 min="0"
                 value={formData.numberDaysDisableEditing}
-                onChange={(e) => handleChange("numberDaysDisableEditing", parseInt(e.target.value, 10) || 0)}
+                onChange={(e) => handleChange("numberDaysDisableEditing", e.target.value)}
                 required
-                className="h-9 text-xs font-normal"
-                placeholder="0"
+                className="text-xs h-9 font-normal"
               />
             </div>
 
-            {/* 13. Rows per page * */}
+            {/* 13. Rows per page */}
             <div className="space-y-1.5">
               <Label htmlFor="rowsPerPage" className="text-xs font-normal text-foreground">
                 Rows per page <span className="text-destructive">*</span>
@@ -379,17 +326,17 @@ export function SystemSettingsForm() {
               <select
                 id="rowsPerPage"
                 value={formData.rowsPerPage}
-                onChange={(e) => handleChange("rowsPerPage", parseInt(e.target.value, 10) || 10)}
+                onChange={(e) => handleChange("rowsPerPage", e.target.value)}
                 className={selectClassName}
               >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
               </select>
             </div>
 
-            {/* 14. Date Format * */}
+            {/* 14. Date Format */}
             <div className="space-y-1.5">
               <Label htmlFor="dateFormat" className="text-xs font-normal text-foreground">
                 Date Format <span className="text-destructive">*</span>
@@ -400,14 +347,14 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("dateFormat", e.target.value)}
                 className={selectClassName}
               >
-                <option value="dd-mm-yyyy">dd-mm-yyyy</option>
-                <option value="yyyy-mm-dd">yyyy-mm-dd</option>
-                <option value="mm-dd-yyyy">mm-dd-yyyy</option>
-                <option value="dd/mm/yyyy">dd/mm/yyyy</option>
+                <option value="dd-mm-yyyy">dd-mm-yyyy (e.g. 08-11-2026)</option>
+                <option value="yyyy-mm-dd">yyyy-mm-dd (e.g. 2026-11-08)</option>
+                <option value="mm-dd-yyyy">mm-dd-yyyy (e.g. 11-08-2026)</option>
+                <option value="dd/mm/yyyy">dd/mm/yyyy (e.g. 08/11/2026)</option>
               </select>
             </div>
 
-            {/* 15. Timezone * */}
+            {/* 15. Timezone */}
             <div className="space-y-1.5">
               <Label htmlFor="timezone" className="text-xs font-normal text-foreground">
                 Timezone <span className="text-destructive">*</span>
@@ -419,17 +366,16 @@ export function SystemSettingsForm() {
                 className={selectClassName}
               >
                 <option value="Asia/Dhaka">Asia/Dhaka (GMT+6)</option>
-                <option value="Africa/Algiers">Africa/Algiers</option>
-                <option value="UTC">UTC</option>
+                <option value="Africa/Algiers">Africa/Algiers (GMT+1)</option>
+                <option value="Asia/Dubai">Asia/Dubai (GMT+4)</option>
+                <option value="Asia/Kolkata">Asia/Kolkata (GMT+5:30)</option>
+                <option value="UTC">UTC (GMT+0)</option>
                 <option value="America/New_York">America/New_York (EST)</option>
                 <option value="Europe/London">Europe/London (GMT)</option>
-                <option value="Asia/Dubai">Asia/Dubai (GST)</option>
-                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
-                <option value="Asia/Singapore">Asia/Singapore (SGT)</option>
               </select>
             </div>
 
-            {/* 16. Calender * */}
+            {/* 16. Calender */}
             <div className="space-y-1.5">
               <Label htmlFor="calender" className="text-xs font-normal text-foreground">
                 Calender <span className="text-destructive">*</span>
@@ -445,7 +391,7 @@ export function SystemSettingsForm() {
               </select>
             </div>
 
-            {/* 17. Default Warehouse * */}
+            {/* 17. Default Warehouse */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultWarehouse" className="text-xs font-normal text-foreground">
                 Default Warehouse <span className="text-destructive">*</span>
@@ -457,30 +403,27 @@ export function SystemSettingsForm() {
                 className={selectClassName}
               >
                 <option value="Uth (1)">Uth (1)</option>
-                <option value="Main Warehouse">Main Warehouse</option>
-                <option value="Central Storage">Central Storage</option>
-                <option value="Branch Outlet 01">Branch Outlet 01</option>
+                <option value="Central Warehouse">Central Warehouse</option>
+                <option value="Outlet 1 Stock">Outlet 1 Stock</option>
               </select>
             </div>
 
-            {/* 18. Default Biller * */}
+            {/* 18. Default Biller */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultBiller" className="text-xs font-normal text-foreground">
                 Default Biller <span className="text-destructive">*</span>
               </Label>
-              <select
+              <Input
                 id="defaultBiller"
                 value={formData.defaultBiller}
                 onChange={(e) => handleChange("defaultBiller", e.target.value)}
-                className={selectClassName}
-              >
-                <option value="Sunshine IT">Sunshine IT</option>
-                <option value="Apex POS">Apex POS</option>
-                <option value="Head Office Retail">Head Office Retail</option>
-              </select>
+                placeholder="e.g. Sunshine IT"
+                required
+                className="text-xs h-9 font-normal"
+              />
             </div>
 
-            {/* 19. PDF Library * */}
+            {/* 19. PDF Library */}
             <div className="space-y-1.5">
               <Label htmlFor="pdfLibrary" className="text-xs font-normal text-foreground">
                 PDF Library <span className="text-destructive">*</span>
@@ -493,10 +436,11 @@ export function SystemSettingsForm() {
               >
                 <option value="mPDF">mPDF</option>
                 <option value="DOMPDF">DOMPDF</option>
+                <option value="TCPDF">TCPDF</option>
               </select>
             </div>
 
-            {/* 20. Use code for slug * */}
+            {/* 20. Use code for slug */}
             <div className="space-y-1.5">
               <Label htmlFor="useCodeForSlug" className="text-xs font-normal text-foreground">
                 Use code for slug <span className="text-destructive">*</span>
@@ -516,7 +460,7 @@ export function SystemSettingsForm() {
           {/* Action Footer */}
           <div className="pt-4 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground font-normal">
-              * Required system parameters will immediately affect store calculations and invoice generation.
+              * Required system parameters will immediately affect store calculations, branding, and invoices across the entire website.
             </p>
 
             <div className="flex items-center gap-2.5 w-full sm:w-auto">
@@ -541,6 +485,16 @@ export function SystemSettingsForm() {
           </div>
         </Card>
       </form>
+    </div>
+  );
+}
+
+function errorSourceMessage(msg: string | null) {
+  if (!msg) return null;
+  return (
+    <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive font-normal animate-in fade-in">
+      <AlertCircle className="h-4 w-4 shrink-0" />
+      <span>{msg}</span>
     </div>
   );
 }

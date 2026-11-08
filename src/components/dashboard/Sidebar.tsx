@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/routing";
+import { useSettings } from "@/hooks/useSettings";
 import {
   LayoutDashboard,
   Settings,
@@ -55,6 +56,7 @@ export function Sidebar({
   const t = useTranslations("sidebar");
   const tSettings = useTranslations("settingsMenu");
   const pathname = usePathname();
+  const { settings } = useSettings();
   const [isHovered, setIsHovered] = useState(false);
 
   // Settings submenu collapsible state (open by default when on settings pages)
@@ -159,10 +161,10 @@ export function Sidebar({
               <Store className="h-4 w-4" />
             </div>
 
-            {/* Brand Title (Visible only when expanded) */}
+            {/* Brand Title (Visible only when expanded, dynamically reflects Site Name) */}
             {(isExpanded || isMobileOpen) && (
               <span className="text-sm font-normal text-sidebar-foreground tracking-tight whitespace-nowrap animate-in fade-in duration-200">
-                {t("brand")}
+                {settings?.siteName || t("brand")}
               </span>
             )}
           </div>
