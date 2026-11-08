@@ -55,6 +55,8 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettingsData = {
   defaultBiller: "Apex POS",
   pdfLibrary: "mPDF",
   useCodeForSlug: "Enable",
+
+  // Products Configuration Sub-section
   productTax: "Enable",
   racks: "Disable",
   productVariants: "Enable",
@@ -69,6 +71,32 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettingsData = {
   barcodeSeparator: "Dot (.)",
   barcodeRenderer: "Image",
   updateCostWithPurchase: "No",
+
+  // Sales Configuration Sub-section
+  overSelling: "Yes",
+  referenceFormat: "Sequence Number",
+  orderTax: "Vat",
+  productLevelDiscount: "Enable",
+  productSerial: "Enable",
+  autoDetectBarcode: "Enable",
+  productsCountFixBarcode: 4,
+  cartItemAdditionMethod: "Add New Item to cart",
+  defaultOrderPageFocus: "Add item input",
+  ksaInvoiceQrCode: "Disable",
+  invoiceView: "Standard",
+
+  // Prefix Configuration Sub-section
+  salesPrefix: "SALE",
+  returnSalePrefix: "SR",
+  paymentPrefix: "IPAY",
+  purchasePaymentPrefix: "POP",
+  deliveryPrefix: "DO",
+  quotationPrefix: "QUOTE",
+  purchasePrefix: "PO",
+  returnPurchasePrefix: "PR",
+  transferPrefix: "TR",
+  expensePrefix: "",
+  qaPrefix: "",
 };
 
 export interface SettingsContextType {

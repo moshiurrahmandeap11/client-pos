@@ -85,6 +85,7 @@ export function SystemSettingsForm() {
         imageHeight: Number(updatedForm.imageHeight) || 800,
         thumbnailWidth: Number(updatedForm.thumbnailWidth) || 150,
         thumbnailHeight: Number(updatedForm.thumbnailHeight) || 150,
+        productsCountFixBarcode: Number(updatedForm.productsCountFixBarcode) || 4,
       };
 
       await updateSettings(payload);
@@ -111,7 +112,7 @@ export function SystemSettingsForm() {
     }
   };
 
-  // Full form submission (for text and numeric fields like Site Name, Email, Biller, Days, Image Sizes)
+  // Full form submission (for text and numeric fields like Site Name, Email, Biller, Days, Image Sizes, Prefixes)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -125,6 +126,7 @@ export function SystemSettingsForm() {
         imageHeight: Number(formData.imageHeight) || 800,
         thumbnailWidth: Number(formData.thumbnailWidth) || 150,
         thumbnailHeight: Number(formData.thumbnailHeight) || 150,
+        productsCountFixBarcode: Number(formData.productsCountFixBarcode) || 4,
       };
 
       const updated = await updateSettings(payload);
@@ -902,11 +904,427 @@ export function SystemSettingsForm() {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Next Module Tab Indicator (as shown in reference ERP mock) */}
-            <div className="flex items-center pt-3">
-              <div className="px-4 py-1 text-xs text-muted-foreground/60 border border-border/40 rounded-t-md bg-muted/20 select-none">
-                Sales
+          {/* Section 3: Sales Configuration Sub-section */}
+          <div className="w-full pt-2">
+            {/* Subsection Tab Header */}
+            <div className="flex items-center">
+              <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
+                {t("salesSection")}
+              </div>
+            </div>
+
+            {/* Sales Fields Box */}
+            <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                {/* 1. Over Selling */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("overSelling")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.overSelling || "Yes"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("overSelling", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Yes">{t("yes")}</SelectItem>
+                      <SelectItem value="No">{t("no")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 2. Reference Format */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("referenceFormat")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.referenceFormat || "Sequence Number"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("referenceFormat", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Sequence Number">{t("refSequenceNumber")}</SelectItem>
+                      <SelectItem value="Year / Sequence Number">{t("refYearSequenceNumber")}</SelectItem>
+                      <SelectItem value="Random Number">{t("refRandomNumber")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 3. Order Tax */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("orderTax")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.orderTax || "Vat"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("orderTax", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Vat">{t("orderTaxVat")}</SelectItem>
+                      <SelectItem value="No Tax">{t("orderTaxNoTax")}</SelectItem>
+                      <SelectItem value="GST">{t("orderTaxGst")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 4. Product Level Discount */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("productLevelDiscount")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.productLevelDiscount || "Enable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("productLevelDiscount", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 5. Product Serial */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("productSerial")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.productSerial || "Enable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("productSerial", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 6. Auto Detect Barcode */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("autoDetectBarcode")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.autoDetectBarcode || "Enable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("autoDetectBarcode", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 7. Products count to Fix barcode input */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="productsCountFixBarcode" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("productsCountFixBarcode")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="productsCountFixBarcode"
+                    type="number"
+                    min={0}
+                    value={formData.productsCountFixBarcode ?? 4}
+                    onChange={(e) =>
+                      handleChange("productsCountFixBarcode", Number(e.target.value))
+                    }
+                    placeholder="4"
+                    required
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 8. Cart Item Addition Method */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("cartItemAdditionMethod")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.cartItemAdditionMethod || "Add New Item to cart"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("cartItemAdditionMethod", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Add New Item to cart">
+                        {t("cartAddNewItem")}
+                      </SelectItem>
+                      <SelectItem value="Increase Quantity of existing item">
+                        {t("cartIncreaseQuantity")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 9. Default Order Page Focus */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("defaultOrderPageFocus")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.defaultOrderPageFocus || "Add item input"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("defaultOrderPageFocus", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Add item input">
+                        {t("focusAddItemInput")}
+                      </SelectItem>
+                      <SelectItem value="Customer input">
+                        {t("focusCustomerInput")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 10. KSA Invoice QRCode */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("ksaInvoiceQrCode")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.ksaInvoiceQrCode || "Disable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("ksaInvoiceQrCode", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 11. Invoice View */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("invoiceView")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.invoiceView || "Standard"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("invoiceView", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Standard">{t("invoiceViewStandard")}</SelectItem>
+                      <SelectItem value="Tax Invoice">{t("invoiceViewTax")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Prefix Configuration Sub-section */}
+          <div className="w-full pt-2">
+            {/* Subsection Tab Header */}
+            <div className="flex items-center">
+              <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
+                {t("prefixSection")}
+              </div>
+            </div>
+
+            {/* Prefix Fields Box */}
+            <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                {/* 1. Sales Reference Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="salesPrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("salesPrefix")}
+                  </Label>
+                  <Input
+                    id="salesPrefix"
+                    value={formData.salesPrefix ?? "SALE"}
+                    onChange={(e) => handleChange("salesPrefix", e.target.value)}
+                    placeholder="SALE"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 2. Return Sale Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="returnSalePrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("returnSalePrefix")}
+                  </Label>
+                  <Input
+                    id="returnSalePrefix"
+                    value={formData.returnSalePrefix ?? "SR"}
+                    onChange={(e) => handleChange("returnSalePrefix", e.target.value)}
+                    placeholder="SR"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 3. Payment Reference Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="paymentPrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("paymentPrefix")}
+                  </Label>
+                  <Input
+                    id="paymentPrefix"
+                    value={formData.paymentPrefix ?? "IPAY"}
+                    onChange={(e) => handleChange("paymentPrefix", e.target.value)}
+                    placeholder="IPAY"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 4. Purchase Payment Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="purchasePaymentPrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("purchasePaymentPrefix")}
+                  </Label>
+                  <Input
+                    id="purchasePaymentPrefix"
+                    value={formData.purchasePaymentPrefix ?? "POP"}
+                    onChange={(e) => handleChange("purchasePaymentPrefix", e.target.value)}
+                    placeholder="POP"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 5. Delivery Reference Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="deliveryPrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("deliveryPrefix")}
+                  </Label>
+                  <Input
+                    id="deliveryPrefix"
+                    value={formData.deliveryPrefix ?? "DO"}
+                    onChange={(e) => handleChange("deliveryPrefix", e.target.value)}
+                    placeholder="DO"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 6. Quotation Reference Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="quotationPrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("quotationPrefix")}
+                  </Label>
+                  <Input
+                    id="quotationPrefix"
+                    value={formData.quotationPrefix ?? "QUOTE"}
+                    onChange={(e) => handleChange("quotationPrefix", e.target.value)}
+                    placeholder="QUOTE"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 7. Purchase Reference Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="purchasePrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("purchasePrefix")}
+                  </Label>
+                  <Input
+                    id="purchasePrefix"
+                    value={formData.purchasePrefix ?? "PO"}
+                    onChange={(e) => handleChange("purchasePrefix", e.target.value)}
+                    placeholder="PO"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 8. Return Purchase Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="returnPurchasePrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("returnPurchasePrefix")}
+                  </Label>
+                  <Input
+                    id="returnPurchasePrefix"
+                    value={formData.returnPurchasePrefix ?? "PR"}
+                    onChange={(e) => handleChange("returnPurchasePrefix", e.target.value)}
+                    placeholder="PR"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 9. Transfer Reference Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="transferPrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("transferPrefix")}
+                  </Label>
+                  <Input
+                    id="transferPrefix"
+                    value={formData.transferPrefix ?? "TR"}
+                    onChange={(e) => handleChange("transferPrefix", e.target.value)}
+                    placeholder="TR"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 10. Expense Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="expensePrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("expensePrefix")}
+                  </Label>
+                  <Input
+                    id="expensePrefix"
+                    value={formData.expensePrefix ?? ""}
+                    onChange={(e) => handleChange("expensePrefix", e.target.value)}
+                    placeholder="EX"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 11. Quantity Adjustment Prefix */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="qaPrefix" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("qaPrefix")}
+                  </Label>
+                  <Input
+                    id="qaPrefix"
+                    value={formData.qaPrefix ?? ""}
+                    onChange={(e) => handleChange("qaPrefix", e.target.value)}
+                    placeholder="QA"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
               </div>
             </div>
           </div>
