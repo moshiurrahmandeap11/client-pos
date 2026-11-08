@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { Menu, Wifi } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -15,11 +15,10 @@ interface TopbarProps {
 
 export function Topbar({ onOpenMobileMenu, activeItemTitle }: TopbarProps) {
   const t = useTranslations("dashboard");
-  const tTopbar = useTranslations("topbar");
 
   return (
     <header className="sticky top-0 z-20 h-14 w-full bg-background/85 backdrop-blur-md border-b border-border/80 flex items-center justify-between px-3 sm:px-5 select-none transition-colors">
-      {/* Left Section: Mobile Menu Trigger + Breadcrumb/Status sync */}
+      {/* Left Section: Mobile Menu Trigger + Clean Page/Section Title */}
       <div className="flex items-center gap-3">
         {/* Mobile Hamburger Drawer Trigger */}
         <Button
@@ -32,18 +31,12 @@ export function Topbar({ onOpenMobileMenu, activeItemTitle }: TopbarProps) {
           <Menu className="h-4 w-4" />
         </Button>
 
-        {/* Station Status & Location Indicator */}
+        {/* Live Status indicator + Clean Location Title (No confusing 'Terminal' wording) */}
         <div className="flex items-center gap-2">
           <span className="flex h-2 w-2 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
-
-          <span className="text-xs font-normal text-muted-foreground hidden sm:inline-block">
-            {tTopbar("terminal")}
-          </span>
-
-          <span className="text-xs text-muted-foreground/40 hidden sm:inline-block">/</span>
 
           <span className="text-xs font-normal text-foreground">
             {activeItemTitle || t("title")}

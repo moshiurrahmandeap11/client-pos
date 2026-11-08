@@ -199,7 +199,7 @@ export function DashboardContent({
           <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-              <CardTitle className="text-sm font-normal">Register #01 - Active Shift</CardTitle>
+              <CardTitle className="text-sm font-normal">Active Shift (Counter #01)</CardTitle>
             </div>
             <span className="text-xs text-muted-foreground font-normal">
               Started at 08:30 AM

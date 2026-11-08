@@ -1,9 +1,9 @@
 {
   "auth": {
     "terminalTitle": "অ্যাপেক্স পস",
-    "terminalSubtitle": "পয়েন্ট অব সেল টার্মিনাল",
+    "terminalSubtitle": "পয়েন্ট অব সেল",
     "loginTitle": "অপারেটর সাইন ইন",
-    "loginDescription": "টার্মিনালে প্রবেশ করতে আপনার তথ্য প্রদান করুন",
+    "loginDescription": "সিস্টেমে সাইন ইন করতে আপনার তথ্য দিন",
     "emailLabel": "অপারেটর ইমেইল",
     "emailPlaceholder": "operator@apexpos.com",
     "passwordLabel": "পাসওয়ার্ড",
@@ -11,7 +11,7 @@
     "submitButton": "সাইন ইন করুন",
     "submittingButton": "যাচাই করা হচ্ছে...",
     "sessionActive": "সক্রিয় সেশন",
-    "sessionDescription": "টার্মিনাল অনুমোদিত এবং প্রস্তুত",
+    "sessionDescription": "সেশন অনুমোদিত এবং প্রস্তুত",
     "operatorName": "অপারেটর",
     "operatorEmail": "ইমেইল",
     "operatorRole": "পদবি",
@@ -31,9 +31,9 @@
   "dashboard": {
     "title": "ড্যাশবোর্ড",
     "welcome": "স্বাগতম",
-    "systemStatus": "টার্মিনাল অনলাইন",
-    "settingsTitle": "স্টেশন সেটিংস",
-    "settingsDesc": "টার্মিনাল ও কাউন্টার সংক্রান্ত কনফিগারেশন",
+    "systemStatus": "অনলাইন",
+    "settingsTitle": "দোকান ও পিওএস সেটিংস",
+    "settingsDesc": "সিস্টেম অপশন ও দোকানের কনফিগারেশন",
     "overview": "সংক্ষিপ্ত বিবরণ",
     "activeSession": "অনুমোদিত সেশন",
     "readyText": "অ্যাপেক্স রিটেল পিওএস ইঞ্জিন বিক্রয় কার্যক্রমের জন্য প্রস্তুত রয়েছে।",
@@ -42,11 +42,11 @@
     "avgTicket": "গড় অর্ডার মূল্য",
     "cashDrawer": "ক্যাশ ড্রয়ার",
     "cashInDrawer": "ড্রয়ারে নগদ (ফ্লোট + ক্যাশ)",
-    "quickActions": "দ্রুত পিওএস শর্টকাট",
-    "newSale": "নতুন রেজিস্টার সেল",
+    "quickActions": "দ্রুত শর্টকাট",
+    "newSale": "নতুন সেল",
     "refundSale": "রিফান্ড প্রক্রিয়া",
     "stockLookup": "পণ্য ও মূল্য যাচাই",
-    "shiftEnd": "রেজিস্টার শিফট বন্ধ"
+    "shiftEnd": "শিফট বন্ধ"
   },
   "sidebar": {
     "brand": "অ্যাপেক্স পস",
@@ -79,7 +79,6 @@
     "backups": "ব্যাকআপ ও রিকভারি"
   },
   "topbar": {
-    "terminal": "টার্মিনাল ০১",
     "profile": "প্রোফাইল",
     "logout": "লগআউট",
     "loggingOut": "লগআউট হচ্ছে...",
@@ -90,9 +89,9 @@
   },
   "notFound": {
     "badge": "৪০৪ ত্রুটি",
-    "title": "টার্মিনাল স্ক্রিন পাওয়া যায়নি",
-    "description": "অনুরোধকৃত স্ক্রিন বা পৃষ্ঠাটি এই পিওএস স্টেশনে খুঁজে পাওয়া যায়নি। এটি অপসারিত হতে পারে অথবা লিংকটি সঠিক নয়।",
+    "title": "পাতাটি খুঁজে পাওয়া যায়নি",
+    "description": "অনুরোধকৃত পৃষ্ঠাটি খুঁজে পাওয়া যায়নি। এটি অপসারিত হতে পারে অথবা লিংকটি সঠিক নয়।",
     "backHome": "ড্যাশবোর্ডে ফিরে যান",
-    "settings": "স্টেশন সেটিংস"
+    "settings": "সেটিংস"
   }
 }

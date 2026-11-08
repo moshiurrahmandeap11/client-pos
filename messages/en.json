@@ -1,9 +1,9 @@
 {
   "auth": {
     "terminalTitle": "APEX POS",
-    "terminalSubtitle": "Point of Sale Terminal",
+    "terminalSubtitle": "Point of Sale",
     "loginTitle": "Operator Sign In",
-    "loginDescription": "Enter your credentials to access the terminal",
+    "loginDescription": "Enter your credentials to sign in",
     "emailLabel": "Operator Email",
     "emailPlaceholder": "operator@apexpos.com",
     "passwordLabel": "Password",
@@ -11,7 +11,7 @@
     "submitButton": "Sign In",
     "submittingButton": "Authenticating...",
     "sessionActive": "Active Session",
-    "sessionDescription": "Terminal authenticated and operational",
+    "sessionDescription": "Session authenticated and ready",
     "operatorName": "Operator",
     "operatorEmail": "Email",
     "operatorRole": "Role",
@@ -31,9 +31,9 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome back",
-    "systemStatus": "Terminal Online",
-    "settingsTitle": "Station Settings",
-    "settingsDesc": "Configure terminal preferences and station controls",
+    "systemStatus": "Online",
+    "settingsTitle": "Store & POS Settings",
+    "settingsDesc": "Configure system options and store controls",
     "overview": "Overview",
     "activeSession": "Authenticated Session",
     "readyText": "Apex Retail POS Engine is ready for sales processing.",
@@ -79,7 +79,6 @@
     "backups": "Backups"
   },
   "topbar": {
-    "terminal": "Terminal #01",
     "profile": "Profile",
     "logout": "Log Out",
     "loggingOut": "Logging out...",
@@ -90,9 +89,9 @@
   },
   "notFound": {
     "badge": "404 Error",
-    "title": "Terminal Screen Not Found",
-    "description": "The requested screen or resource was not found on this POS station. It may have been relocated, removed, or typed incorrectly.",
+    "title": "Page Not Found",
+    "description": "The requested screen or resource was not found. It may have been moved, removed, or typed incorrectly.",
     "backHome": "Back to Dashboard",
-    "settings": "Station Settings"
+    "settings": "Settings"
   }
 }
