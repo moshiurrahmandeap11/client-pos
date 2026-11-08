@@ -6,7 +6,6 @@ import {
   Settings,
   Store,
   PanelLeftClose,
-  PanelLeft,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,7 +31,8 @@ export function Sidebar({
   const [isHovered, setIsHovered] = useState(false);
 
   // MongoDB-style dynamic hover expansion:
-  // If pinned open, stays open. If unpinned/shrunk, expands smoothly on hover and shrinks on mouse leave.
+  // When pinned open, stays open (w-64).
+  // When shrinked (w-16), hovering expands smoothly to w-64, mouse leave shrinks back to w-16.
   const isExpanded = isPinnedExpanded || isHovered;
 
   return (
@@ -76,54 +76,64 @@ export function Sidebar({
         `}
       >
         {/* Top Synchronized Header (Height h-14 to match Topbar exactly) */}
-        <div className="h-14 shrink-0 flex items-center justify-between px-3 border-b border-sidebar-border/80">
-          <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <div
+          className={`h-14 shrink-0 flex items-center border-b border-sidebar-border/80 transition-all duration-300 ${
+            isExpanded || isMobileOpen
+              ? "justify-between px-3"
+              : "justify-center px-0"
+          }`}
+        >
+          {/* Logo & Brand Wrapper: When shrinked, ONLY the centered logo is shown */}
+          <div
+            onClick={() => {
+              if (!isExpanded) onTogglePin();
+            }}
+            className={`flex items-center gap-2.5 min-w-0 transition-all duration-200 ${
+              !isExpanded ? "cursor-pointer" : ""
+            }`}
+            title={!isExpanded ? t("expand") : undefined}
+          >
+            {/* The Logo Icon */}
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-transform hover:scale-105">
               <Store className="h-4 w-4" />
             </div>
 
-            {/* Brand Title (Fades in when expanded) */}
-            <div
-              className={`flex flex-col whitespace-nowrap transition-all duration-200 ${
-                isExpanded || isMobileOpen
-                  ? "opacity-100 max-w-[140px]"
-                  : "opacity-0 max-w-0 overflow-hidden"
-              }`}
-            >
-              <span className="text-sm font-normal text-sidebar-foreground tracking-tight">
+            {/* Brand Title (Visible only when expanded) */}
+            {(isExpanded || isMobileOpen) && (
+              <span className="text-sm font-normal text-sidebar-foreground tracking-tight whitespace-nowrap animate-in fade-in duration-200">
                 {t("brand")}
               </span>
-            </div>
+            )}
           </div>
 
-          {/* Desktop Pin / Collapse Toggle Button */}
-          <div className="hidden md:flex items-center">
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={onTogglePin}
-              title={isPinnedExpanded ? t("collapse") : t("expand")}
-              className="text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent cursor-pointer rounded-md"
-            >
-              {isPinnedExpanded ? (
+          {/* Desktop Collapse Toggle Button (Visible ONLY when expanded) */}
+          {(isExpanded || isMobileOpen) && (
+            <div className="hidden md:flex items-center animate-in fade-in duration-150">
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={onTogglePin}
+                title={t("collapse")}
+                className="text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent cursor-pointer rounded-md"
+              >
                 <PanelLeftClose className="h-3.5 w-3.5" />
-              ) : (
-                <PanelLeft className="h-3.5 w-3.5" />
-              )}
-            </Button>
-          </div>
+              </Button>
+            </div>
+          )}
 
           {/* Mobile Close Button */}
-          <div className="flex md:hidden items-center">
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={onCloseMobile}
-              className="text-sidebar-foreground/70 hover:text-sidebar-foreground cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          {isMobileOpen && (
+            <div className="flex md:hidden items-center">
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={onCloseMobile}
+                className="text-sidebar-foreground/70 hover:text-sidebar-foreground cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Sidebar Nav Items (Only "Settings" as requested) */}
@@ -135,8 +145,13 @@ export function Sidebar({
               if (isMobileOpen) onCloseMobile();
             }}
             className={`
-              w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-normal
+              w-full flex items-center rounded-lg text-xs font-normal
               transition-all duration-200 cursor-pointer outline-none
+              ${
+                isExpanded || isMobileOpen
+                  ? "justify-start px-2.5 py-2 gap-3"
+                  : "justify-center h-10 px-0"
+              }
               ${
                 activeItem === "settings"
                   ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-xs font-normal"
@@ -147,19 +162,15 @@ export function Sidebar({
           >
             <Settings className="h-4 w-4 shrink-0" />
 
-            <span
-              className={`whitespace-nowrap transition-all duration-200 ${
-                isExpanded || isMobileOpen
-                  ? "opacity-100 max-w-[160px]"
-                  : "opacity-0 max-w-0 overflow-hidden"
-              }`}
-            >
-              {t("settings")}
-            </span>
+            {(isExpanded || isMobileOpen) && (
+              <span className="whitespace-nowrap transition-all duration-200 animate-in fade-in">
+                {t("settings")}
+              </span>
+            )}
           </button>
         </div>
 
-        {/* Bottom Status / Footer - Keep blank & clean as requested */}
+        {/* Bottom Area - Keep blank & clean as requested */}
         <div className="h-4 shrink-0" />
       </aside>
     </>
