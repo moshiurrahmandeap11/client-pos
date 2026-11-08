@@ -88,6 +88,12 @@ export interface SystemSettingsData {
   // Email Sub-section
   emailProtocol: string;
 
+  // Award Points Configuration Sub-section
+  customerAwardPointsSpent: number;
+  customerAwardPoints: number;
+  staffAwardPointsSale: number;
+  staffAwardPoints: number;
+
   updatedAt?: string;
 }
 
@@ -113,5 +119,12 @@ export const settingsService = {
       throw new Error(response.data.message || "Failed to update system settings");
     }
     return response.data.data;
+  },
+
+  async runCronJob(): Promise<{ success: boolean; message: string; data?: any }> {
+    const response = await apiClient.post<ApiResponse<any>>(
+      "/settings/system-settings/cron/run"
+    );
+    return response.data;
   },
 };

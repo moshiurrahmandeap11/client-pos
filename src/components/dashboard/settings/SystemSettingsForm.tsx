@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/routing";
 import toast from "react-hot-toast";
 import { useSettings } from "@/hooks/useSettings";
-import { SystemSettingsData } from "@/services/settings.service";
+import { settingsService, SystemSettingsData } from "@/services/settings.service";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,11 @@ import {
 import {
   Save,
   Loader2,
+  ArrowRight,
+  Play,
+  Copy,
+  Check,
+  Clock,
 } from "lucide-react";
 
 export function SystemSettingsForm() {
@@ -32,10 +37,13 @@ export function SystemSettingsForm() {
     settings,
     updateSettings,
     changeThemeWithAnimation,
+    currencySymbol,
     isLoading: isContextLoading,
   } = useSettings();
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isRunningCron, setIsRunningCron] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Form State initialized from global context settings
   const [formData, setFormData] = useState<SystemSettingsData>(settings);
@@ -100,6 +108,10 @@ export function SystemSettingsForm() {
         wsWeightStartPos: Number(updatedForm.wsWeightStartPos) || 0,
         wsWeightChars: Number(updatedForm.wsWeightChars) || 0,
         wsWeightDivideBy: Number(updatedForm.wsWeightDivideBy) || 0,
+        customerAwardPointsSpent: Number(updatedForm.customerAwardPointsSpent) || 0,
+        customerAwardPoints: Number(updatedForm.customerAwardPoints) || 0,
+        staffAwardPointsSale: Number(updatedForm.staffAwardPointsSale) || 0,
+        staffAwardPoints: Number(updatedForm.staffAwardPoints) || 0,
       };
 
       await updateSettings(payload);
@@ -126,7 +138,7 @@ export function SystemSettingsForm() {
     }
   };
 
-  // Full form submission (for text and numeric fields)
+  // Full form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -150,6 +162,10 @@ export function SystemSettingsForm() {
         wsWeightStartPos: Number(formData.wsWeightStartPos) || 0,
         wsWeightChars: Number(formData.wsWeightChars) || 0,
         wsWeightDivideBy: Number(formData.wsWeightDivideBy) || 0,
+        customerAwardPointsSpent: Number(formData.customerAwardPointsSpent) || 0,
+        customerAwardPoints: Number(formData.customerAwardPoints) || 0,
+        staffAwardPointsSale: Number(formData.staffAwardPointsSale) || 0,
+        staffAwardPoints: Number(formData.staffAwardPoints) || 0,
       };
 
       const updated = await updateSettings(payload);
@@ -178,6 +194,29 @@ export function SystemSettingsForm() {
     }
   };
 
+  // Run Cron Job handler
+  const handleRunCron = async () => {
+    setIsRunningCron(true);
+    try {
+      const res = await settingsService.runCronJob();
+      toast.success(t("cronJobSuccess"));
+    } catch (err: any) {
+      toast.error(err.message || "Failed to execute cron job");
+    } finally {
+      setIsRunningCron(false);
+    }
+  };
+
+  // Copy command to clipboard
+  const handleCopy = (text: string, index: number) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedIndex(index);
+      toast.success(t("copied"));
+      setTimeout(() => setCopiedIndex(null), 2000);
+    }
+  };
+
   if (isContextLoading && !formData.siteName) {
     return (
       <Card className="w-full border-border bg-card p-10 flex flex-col items-center justify-center space-y-3">
@@ -190,6 +229,11 @@ export function SystemSettingsForm() {
   }
 
   const isBn = currentLocale === "bn";
+
+  const cronCommand1 =
+    "0 1 * * * wget -qO- http://localhost:5000/api/v1/settings/system-settings/cron/run >/dev/null 2>&1";
+  const cronCommand2 =
+    "0 1 * * * curl -s http://localhost:5000/api/v1/settings/system-settings/cron/run >/dev/null 2>&1";
 
   return (
     <div className="w-full space-y-6">
@@ -1688,6 +1732,109 @@ export function SystemSettingsForm() {
             </div>
           </div>
 
+          {/* Section 8: Award Points Sub-section */}
+          <div className="w-full pt-2">
+            <div className="flex items-center">
+              <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
+                {t("awardPointsSection")}
+              </div>
+            </div>
+
+            <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px] space-y-6">
+              {/* Row 1: Customer Award Points */}
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-[13px] font-medium text-foreground">
+                  {t("customerAwardPoints")}
+                </Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                  <div className="flex-1 space-y-1">
+                    <span className="text-[11.5px] sm:text-xs text-muted-foreground font-normal">
+                      {t("eachSpentIsEqualTo", { symbol: currencySymbol })}
+                    </span>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="any"
+                      value={formData.customerAwardPointsSpent || ""}
+                      onChange={(e) =>
+                        handleChange("customerAwardPointsSpent", Number(e.target.value))
+                      }
+                      placeholder="0"
+                      className="text-xs sm:text-[13px] h-9.5 font-normal"
+                    />
+                  </div>
+
+                  <div className="hidden sm:flex items-center justify-center pt-5 px-1">
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+
+                  <div className="flex-1 space-y-1">
+                    <span className="text-[11.5px] sm:text-xs text-muted-foreground font-normal">
+                      {t("awardPoints")}
+                    </span>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="any"
+                      value={formData.customerAwardPoints || ""}
+                      onChange={(e) =>
+                        handleChange("customerAwardPoints", Number(e.target.value))
+                      }
+                      placeholder="0"
+                      className="text-xs sm:text-[13px] h-9.5 font-normal"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Staff Award Points */}
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-[13px] font-medium text-foreground">
+                  {t("staffAwardPoints")}
+                </Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                  <div className="flex-1 space-y-1">
+                    <span className="text-[11.5px] sm:text-xs text-muted-foreground font-normal">
+                      {t("eachInSaleIsEqualTo", { symbol: currencySymbol })}
+                    </span>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="any"
+                      value={formData.staffAwardPointsSale || ""}
+                      onChange={(e) =>
+                        handleChange("staffAwardPointsSale", Number(e.target.value))
+                      }
+                      placeholder="0"
+                      className="text-xs sm:text-[13px] h-9.5 font-normal"
+                    />
+                  </div>
+
+                  <div className="hidden sm:flex items-center justify-center pt-5 px-1">
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+
+                  <div className="flex-1 space-y-1">
+                    <span className="text-[11.5px] sm:text-xs text-muted-foreground font-normal">
+                      {t("awardPoints")}
+                    </span>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="any"
+                      value={formData.staffAwardPoints || ""}
+                      onChange={(e) =>
+                        handleChange("staffAwardPoints", Number(e.target.value))
+                      }
+                      placeholder="0"
+                      className="text-xs sm:text-[13px] h-9.5 font-normal"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Action Footer */}
           <div className="pt-4 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs sm:text-[13px] text-muted-foreground font-normal">
@@ -1698,7 +1845,7 @@ export function SystemSettingsForm() {
               <Button
                 type="submit"
                 disabled={isSaving}
-                className="w-full sm:w-auto gap-2 text-xs sm:text-[13px] font-normal h-10 px-5 cursor-pointer"
+                className="w-full sm:w-auto gap-2 text-xs sm:text-[13px] font-normal h-10 px-5 cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {isSaving ? (
                   <>
@@ -1716,6 +1863,82 @@ export function SystemSettingsForm() {
           </div>
         </Card>
       </form>
+
+      {/* Section 9: Automated Background Cron Job Panel (As seen in ERP reference mock) */}
+      <Card className="border border-sky-200 dark:border-sky-900/50 bg-sky-50/60 dark:bg-sky-950/20 p-5 rounded-md space-y-3.5 shadow-2xs">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-foreground font-medium text-xs sm:text-[13.5px]">
+            <Clock className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+            <span>{t("cronJobTitle")}</span>
+          </div>
+
+          <Button
+            type="button"
+            onClick={handleRunCron}
+            disabled={isRunningCron}
+            className="text-xs sm:text-[12.5px] h-8.5 px-3.5 gap-1.5 cursor-pointer bg-sky-600 hover:bg-sky-700 text-white font-normal"
+          >
+            {isRunningCron ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>{t("runningCronJob")}</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5 fill-current" />
+                <span>{t("runCronJobNow")}</span>
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Cron Command 1 (wget) */}
+        <div className="relative group">
+          <div className="bg-card border border-border/80 rounded px-3 py-2 text-xs font-mono text-foreground/90 overflow-x-auto whitespace-pre pr-10">
+            {cronCommand1}
+          </div>
+          <button
+            type="button"
+            onClick={() => handleCopy(cronCommand1, 1)}
+            title={t("copyCommand")}
+            className="absolute right-2 top-2 p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            {copiedIndex === 1 ? (
+              <Check className="h-4 w-4 text-emerald-600" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          {t("or")}
+        </div>
+
+        {/* Cron Command 2 (curl) */}
+        <div className="relative group">
+          <div className="bg-card border border-border/80 rounded px-3 py-2 text-xs font-mono text-foreground/90 overflow-x-auto whitespace-pre pr-10">
+            {cronCommand2}
+          </div>
+          <button
+            type="button"
+            onClick={() => handleCopy(cronCommand2, 2)}
+            title={t("copyCommand")}
+            className="absolute right-2 top-2 p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            {copiedIndex === 2 ? (
+              <Check className="h-4 w-4 text-emerald-600" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+
+        {/* CLI Reference */}
+        <p className="text-xs text-muted-foreground font-normal">
+          For CLI: <code className="text-destructive font-mono bg-destructive/10 px-1 py-0.5 rounded">node dist/src/app/server.js cron:run</code>
+        </p>
+      </Card>
     </div>
   );
 }

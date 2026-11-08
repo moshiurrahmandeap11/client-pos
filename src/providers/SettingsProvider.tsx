@@ -119,6 +119,12 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettingsData = {
 
   // Email Sub-section
   emailProtocol: "PHP Mail Function",
+
+  // Award Points Configuration Sub-section
+  customerAwardPointsSpent: 0,
+  customerAwardPoints: 0,
+  staffAwardPointsSale: 0,
+  staffAwardPoints: 0,
 };
 
 export interface SettingsContextType {
