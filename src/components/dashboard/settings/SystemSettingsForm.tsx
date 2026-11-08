@@ -64,9 +64,14 @@ export function SystemSettingsForm() {
     value: string
   ) => {
     // 1. Immediately update local form data state
+    const isNumField =
+      field === "rowsPerPage" ||
+      field === "decimals" ||
+      field === "quantityDecimals";
+
     const updatedForm: SystemSettingsData = {
       ...formData,
-      [field]: field === "rowsPerPage" ? Number(value) : value,
+      [field]: isNumField ? Number(value) : value,
     };
     setFormData(updatedForm);
 
@@ -86,6 +91,15 @@ export function SystemSettingsForm() {
         thumbnailWidth: Number(updatedForm.thumbnailWidth) || 150,
         thumbnailHeight: Number(updatedForm.thumbnailHeight) || 150,
         productsCountFixBarcode: Number(updatedForm.productsCountFixBarcode) || 4,
+        decimals: Number(updatedForm.decimals) ?? 2,
+        quantityDecimals: Number(updatedForm.quantityDecimals) ?? 2,
+        wsBarcodeTotalChars: Number(updatedForm.wsBarcodeTotalChars) || 0,
+        wsFlagChars: Number(updatedForm.wsFlagChars) || 0,
+        wsItemCodeStartPos: Number(updatedForm.wsItemCodeStartPos) || 0,
+        wsItemCodeChars: Number(updatedForm.wsItemCodeChars) || 0,
+        wsWeightStartPos: Number(updatedForm.wsWeightStartPos) || 0,
+        wsWeightChars: Number(updatedForm.wsWeightChars) || 0,
+        wsWeightDivideBy: Number(updatedForm.wsWeightDivideBy) || 0,
       };
 
       await updateSettings(payload);
@@ -112,7 +126,7 @@ export function SystemSettingsForm() {
     }
   };
 
-  // Full form submission (for text and numeric fields like Site Name, Email, Biller, Days, Image Sizes, Prefixes)
+  // Full form submission (for text and numeric fields)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -127,6 +141,15 @@ export function SystemSettingsForm() {
         thumbnailWidth: Number(formData.thumbnailWidth) || 150,
         thumbnailHeight: Number(formData.thumbnailHeight) || 150,
         productsCountFixBarcode: Number(formData.productsCountFixBarcode) || 4,
+        decimals: Number(formData.decimals) ?? 2,
+        quantityDecimals: Number(formData.quantityDecimals) ?? 2,
+        wsBarcodeTotalChars: Number(formData.wsBarcodeTotalChars) || 0,
+        wsFlagChars: Number(formData.wsFlagChars) || 0,
+        wsItemCodeStartPos: Number(formData.wsItemCodeStartPos) || 0,
+        wsItemCodeChars: Number(formData.wsItemCodeChars) || 0,
+        wsWeightStartPos: Number(formData.wsWeightStartPos) || 0,
+        wsWeightChars: Number(formData.wsWeightChars) || 0,
+        wsWeightDivideBy: Number(formData.wsWeightDivideBy) || 0,
       };
 
       const updated = await updateSettings(payload);
@@ -170,7 +193,7 @@ export function SystemSettingsForm() {
 
   return (
     <div className="w-full space-y-6">
-      {/* Section Header - Clean with no icon next to title */}
+      {/* Section Header */}
       <div className="pb-3 border-b border-border/50">
         <h1 className="text-xl sm:text-2xl font-normal text-foreground tracking-tight">
           {t("title")}
@@ -619,14 +642,12 @@ export function SystemSettingsForm() {
 
           {/* Section 2: Products Configuration Sub-section */}
           <div className="w-full pt-2">
-            {/* Subsection Tab Header */}
             <div className="flex items-center">
               <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
                 {t("productsSection")}
               </div>
             </div>
 
-            {/* Products Fields Box */}
             <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
                 {/* 1. Product Tax */}
@@ -908,14 +929,12 @@ export function SystemSettingsForm() {
 
           {/* Section 3: Sales Configuration Sub-section */}
           <div className="w-full pt-2">
-            {/* Subsection Tab Header */}
             <div className="flex items-center">
               <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
                 {t("salesSection")}
               </div>
             </div>
 
-            {/* Sales Fields Box */}
             <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
                 {/* 1. Over Selling */}
@@ -1162,14 +1181,12 @@ export function SystemSettingsForm() {
 
           {/* Section 4: Prefix Configuration Sub-section */}
           <div className="w-full pt-2">
-            {/* Subsection Tab Header */}
             <div className="flex items-center">
               <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
                 {t("prefixSection")}
               </div>
             </div>
 
-            {/* Prefix Fields Box */}
             <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
                 {/* 1. Sales Reference Prefix */}
@@ -1324,6 +1341,348 @@ export function SystemSettingsForm() {
                     placeholder="QA"
                     className="text-xs sm:text-[13px] h-9.5 font-normal"
                   />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 5: Money and Number Format Sub-section */}
+          <div className="w-full pt-2">
+            <div className="flex items-center">
+              <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
+                {t("moneyFormatSection")}
+              </div>
+            </div>
+
+            <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                {/* 1. Decimals */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("decimals")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={String(formData.decimals ?? 2)}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("decimals", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">0</SelectItem>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 2. Quantity Decimals */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("quantityDecimals")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={String(formData.quantityDecimals ?? 2)}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("quantityDecimals", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">0</SelectItem>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 3. South Asian Countries Currency Format */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("southAsianCurrencyFormat")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.southAsianCurrencyFormat || "Disable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("southAsianCurrencyFormat", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 4. Decimals Separator */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("decimalsSeparator")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.decimalsSeparator || "Dot (.)"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("decimalsSeparator", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Dot (.)">{t("sepDot")}</SelectItem>
+                      <SelectItem value="Comma (,)">{t("sepComma")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 5. Thousands Separator */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("thousandsSeparator")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.thousandsSeparator || "Comma"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("thousandsSeparator", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Comma">{t("sepComma")}</SelectItem>
+                      <SelectItem value="Dot">{t("sepDot")}</SelectItem>
+                      <SelectItem value="Space">{t("sepSpace")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 6. Display Currency Symbol */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("displayCurrencySymbol")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.displayCurrencySymbol || "Before"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("displayCurrencySymbol", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Before">{t("symbolBefore")}</SelectItem>
+                      <SelectItem value="After">{t("symbolAfter")}</SelectItem>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 7. Currency Symbol */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="currencySymbol" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("currencySymbol")}
+                  </Label>
+                  <Input
+                    id="currencySymbol"
+                    value={formData.currencySymbol ?? "৳"}
+                    onChange={(e) => handleChange("currencySymbol", e.target.value)}
+                    placeholder="৳"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 6: Weighing Scale Barcode Sub-section */}
+          <div className="w-full pt-2">
+            <div className="flex items-center">
+              <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
+                {t("weighingScaleSection")}
+              </div>
+            </div>
+
+            <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                {/* 1. Barcode contains */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("wsBarcodeContains")}
+                  </Label>
+                  <Select
+                    value={formData.wsBarcodeContains || "Weight/Quantity"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("wsBarcodeContains", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Weight/Quantity">{t("wsWeightQuantity")}</SelectItem>
+                      <SelectItem value="Price">{t("wsPrice")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 2. Barcode total characters */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="wsBarcodeTotalChars" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("wsBarcodeTotalChars")}
+                  </Label>
+                  <Input
+                    id="wsBarcodeTotalChars"
+                    type="number"
+                    min={0}
+                    value={formData.wsBarcodeTotalChars ?? 0}
+                    onChange={(e) => handleChange("wsBarcodeTotalChars", Number(e.target.value))}
+                    placeholder="0"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 3. Flag Characters */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="wsFlagChars" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("wsFlagChars")}
+                  </Label>
+                  <Input
+                    id="wsFlagChars"
+                    type="number"
+                    min={0}
+                    value={formData.wsFlagChars ?? 0}
+                    onChange={(e) => handleChange("wsFlagChars", Number(e.target.value))}
+                    placeholder="0"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 4. Item Code Starting Position */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <Label htmlFor="wsItemCodeStartPos" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("wsItemCodeStartPos")}
+                  </Label>
+                  <Input
+                    id="wsItemCodeStartPos"
+                    type="number"
+                    min={0}
+                    value={formData.wsItemCodeStartPos ?? 0}
+                    onChange={(e) => handleChange("wsItemCodeStartPos", Number(e.target.value))}
+                    placeholder="0"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 5. Number of characters in Item Code */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="wsItemCodeChars" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("wsItemCodeChars")}
+                  </Label>
+                  <Input
+                    id="wsItemCodeChars"
+                    type="number"
+                    min={0}
+                    value={formData.wsItemCodeChars ?? 0}
+                    onChange={(e) => handleChange("wsItemCodeChars", Number(e.target.value))}
+                    placeholder="0"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 6. Weight Starting Position */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="wsWeightStartPos" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("wsWeightStartPos")}
+                  </Label>
+                  <Input
+                    id="wsWeightStartPos"
+                    type="number"
+                    min={0}
+                    value={formData.wsWeightStartPos ?? 0}
+                    onChange={(e) => handleChange("wsWeightStartPos", Number(e.target.value))}
+                    placeholder="0"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 7. Number of characters in Weight */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="wsWeightChars" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("wsWeightChars")}
+                  </Label>
+                  <Input
+                    id="wsWeightChars"
+                    type="number"
+                    min={0}
+                    value={formData.wsWeightChars ?? 0}
+                    onChange={(e) => handleChange("wsWeightChars", Number(e.target.value))}
+                    placeholder="0"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+
+                {/* 8. Weight divide by */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="wsWeightDivideBy" className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("wsWeightDivideBy")}
+                  </Label>
+                  <Input
+                    id="wsWeightDivideBy"
+                    type="number"
+                    min={0}
+                    value={formData.wsWeightDivideBy ?? 0}
+                    onChange={(e) => handleChange("wsWeightDivideBy", Number(e.target.value))}
+                    placeholder="0"
+                    className="text-xs sm:text-[13px] h-9.5 font-normal"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 7: Email Sub-section */}
+          <div className="w-full pt-2">
+            <div className="flex items-center">
+              <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
+                {t("emailSection")}
+              </div>
+            </div>
+
+            <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                {/* 1. Email Protocol */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("emailProtocol")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.emailProtocol || "PHP Mail Function"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("emailProtocol", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PHP Mail Function">{t("phpMail")}</SelectItem>
+                      <SelectItem value="SMTP">{t("smtp")}</SelectItem>
+                      <SelectItem value="Sendmail">{t("sendmail")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>

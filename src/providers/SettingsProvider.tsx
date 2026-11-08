@@ -97,6 +97,28 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettingsData = {
   transferPrefix: "TR",
   expensePrefix: "",
   qaPrefix: "",
+
+  // Money and Number Format Sub-section
+  decimals: 2,
+  quantityDecimals: 2,
+  southAsianCurrencyFormat: "Disable",
+  decimalsSeparator: "Dot (.)",
+  thousandsSeparator: "Comma",
+  displayCurrencySymbol: "Before",
+  currencySymbol: "৳",
+
+  // Weighing Scale Barcode Sub-section
+  wsBarcodeContains: "Weight/Quantity",
+  wsBarcodeTotalChars: 0,
+  wsFlagChars: 0,
+  wsItemCodeStartPos: 0,
+  wsItemCodeChars: 0,
+  wsWeightStartPos: 0,
+  wsWeightChars: 0,
+  wsWeightDivideBy: 0,
+
+  // Email Sub-section
+  emailProtocol: "PHP Mail Function",
 };
 
 export interface SettingsContextType {
@@ -104,6 +126,7 @@ export interface SettingsContextType {
   isLoading: boolean;
   currencySymbol: string;
   formatCurrency: (amount: number | string) => string;
+  formatQuantity: (quantity: number | string) => string;
   formatDate: (date?: Date | string | null) => string;
   refreshSettings: () => Promise<void>;
   updateSettings: (payload: Partial<SystemSettingsData>) => Promise<SystemSettingsData>;
@@ -193,23 +216,82 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [settings.theme, currentActiveTheme, setTheme]);
 
-  // Computed currency symbol
-  const currencySymbol = useMemo(() => {
+  // Computed default currency symbol from currency code
+  const codeCurrencySymbol = useMemo(() => {
     const code = (settings.defaultCurrency || "BDT").toUpperCase().trim();
     return CURRENCY_SYMBOLS[code] || code;
   }, [settings.defaultCurrency]);
 
-  // Currency formatter helper
+  // Active currency symbol (prefers custom currencySymbol if provided)
+  const currencySymbol = useMemo(() => {
+    if (settings.currencySymbol && settings.currencySymbol.trim() !== "") {
+      return settings.currencySymbol.trim();
+    }
+    return codeCurrencySymbol;
+  }, [settings.currencySymbol, codeCurrencySymbol]);
+
+  // Currency formatter helper - fully functional with decimals, separators, South Asian formatting, and symbol placement
   const formatCurrency = useCallback(
     (amount: number | string): string => {
       const numeric = typeof amount === "string" ? parseFloat(amount) || 0 : amount || 0;
-      const formattedNumber = numeric.toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+      const decimals = typeof settings.decimals === "number" ? settings.decimals : 2;
+      const isSouthAsian = settings.southAsianCurrencyFormat?.toLowerCase() === "enable";
+
+      // Locale-based numeric base: South Asian (en-IN e.g. 12,34,567.89) or International (en-US e.g. 1,234,567.89)
+      const locale = isSouthAsian ? "en-IN" : "en-US";
+      let formattedNumber = numeric.toLocaleString(locale, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
       });
+
+      // Custom separator handling
+      const decSep = settings.decimalsSeparator?.includes("Comma") ? "," : ".";
+      const thouSep =
+        settings.thousandsSeparator === "Dot"
+          ? "."
+          : settings.thousandsSeparator === "Space"
+          ? " "
+          : ",";
+
+      if (decSep === "," && thouSep === ".") {
+        formattedNumber = formattedNumber.replace(/,/g, "TEMP").replace(/\./g, ",").replace(/TEMP/g, ".");
+      } else if (decSep === "," && thouSep === " ") {
+        formattedNumber = formattedNumber.replace(/,/g, " ").replace(/\./g, ",");
+      } else if (decSep === "." && thouSep === " ") {
+        formattedNumber = formattedNumber.replace(/,/g, " ");
+      }
+
+      // Display symbol placement: Before, After, or Disable
+      const position = settings.displayCurrencySymbol || "Before";
+      if (position === "Disable") {
+        return formattedNumber;
+      }
+      if (position === "After") {
+        return `${formattedNumber} ${currencySymbol}`;
+      }
       return `${currencySymbol}${formattedNumber}`;
     },
-    [currencySymbol]
+    [
+      settings.decimals,
+      settings.southAsianCurrencyFormat,
+      settings.decimalsSeparator,
+      settings.thousandsSeparator,
+      settings.displayCurrencySymbol,
+      currencySymbol,
+    ]
+  );
+
+  // Quantity formatter helper - fully functional with quantityDecimals
+  const formatQuantity = useCallback(
+    (quantity: number | string): string => {
+      const numeric = typeof quantity === "string" ? parseFloat(quantity) || 0 : quantity || 0;
+      const decimals = typeof settings.quantityDecimals === "number" ? settings.quantityDecimals : 2;
+      return numeric.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      });
+    },
+    [settings.quantityDecimals]
   );
 
   // Date formatter helper based on settings.dateFormat (e.g. 'dd-mm-yyyy', 'yyyy-mm-dd')
@@ -245,6 +327,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       currencySymbol,
       formatCurrency,
+      formatQuantity,
       formatDate,
       refreshSettings: fetchSettings,
       updateSettings,
@@ -255,6 +338,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       currencySymbol,
       formatCurrency,
+      formatQuantity,
       formatDate,
       fetchSettings,
       updateSettings,

@@ -66,6 +66,28 @@ export interface SystemSettingsData {
   expensePrefix: string;
   qaPrefix: string;
 
+  // Money and Number Format Sub-section
+  decimals: number;
+  quantityDecimals: number;
+  southAsianCurrencyFormat: string;
+  decimalsSeparator: string;
+  thousandsSeparator: string;
+  displayCurrencySymbol: string;
+  currencySymbol: string;
+
+  // Weighing Scale Barcode Sub-section
+  wsBarcodeContains: string;
+  wsBarcodeTotalChars: number;
+  wsFlagChars: number;
+  wsItemCodeStartPos: number;
+  wsItemCodeChars: number;
+  wsWeightStartPos: number;
+  wsWeightChars: number;
+  wsWeightDivideBy: number;
+
+  // Email Sub-section
+  emailProtocol: string;
+
   updatedAt?: string;
 }
 
