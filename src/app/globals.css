@@ -2,11 +2,41 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Native Direct Font-Face for Li Ador Noirrit */
+@font-face {
+  font-family: 'Li Ador Noirrit';
+  src: url('/fonts/LiAdorNoirrit-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Li Ador Noirrit';
+  src: url('/fonts/LiAdorNoirrit-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Li Ador Noirrit';
+  src: url('/fonts/LiAdorNoirrit-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Li Ador Noirrit';
+  src: url('/fonts/LiAdorNoirrit-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
-  --font-bengali: var(--font-bengali), var(--font-poppins), system-ui, -apple-system, sans-serif;
+  --font-bengali: 'Li Ador Noirrit', var(--font-bengali), var(--font-poppins), system-ui, -apple-system, sans-serif;
   --font-heading: var(--font-sans);
 
   --color-background: var(--background);
@@ -131,12 +161,18 @@
     font-family: var(--font-sans);
     line-height: 1.5;
   }
-  [lang="bn"],
-  [lang="bn"] body,
-  .font-bengali {
-    font-family: var(--font-bengali), var(--font-sans);
-    line-height: 1.5;
-  }
+}
+
+/* Force Li Ador Noirrit font on Bengali mode across all text and components */
+html[lang="bn"],
+[data-locale="bn"],
+.font-bengali,
+html[lang="bn"] *,
+[data-locale="bn"] *,
+.font-bengali * {
+  font-family: 'Li Ador Noirrit', var(--font-bengali), var(--font-poppins), system-ui, sans-serif !important;
+  --font-heading: 'Li Ador Noirrit', var(--font-bengali), var(--font-poppins), system-ui, sans-serif;
+  --font-sans: 'Li Ador Noirrit', var(--font-bengali), var(--font-poppins), system-ui, sans-serif;
 }
 
 /* Circular Expanding View Transition Ripple */

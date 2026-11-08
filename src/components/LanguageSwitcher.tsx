@@ -4,7 +4,7 @@ import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Languages } from "lucide-react";
-import { useTransition } from "react";
+import { useTransition, useEffect } from "react";
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -12,10 +12,18 @@ export function LanguageSwitcher() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = locale;
+      document.documentElement.setAttribute("data-locale", locale);
+    }
+  }, [locale]);
+
   const toggleLanguage = () => {
     const nextLocale = locale === "en" ? "bn" : "en";
     if (typeof document !== "undefined") {
       document.documentElement.lang = nextLocale;
+      document.documentElement.setAttribute("data-locale", nextLocale);
     }
     startTransition(() => {
       router.replace(pathname, { locale: nextLocale });
