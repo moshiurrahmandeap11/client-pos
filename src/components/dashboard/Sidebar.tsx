@@ -2,7 +2,9 @@
 
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/routing";
 import {
+  LayoutDashboard,
   Settings,
   Store,
   PanelLeftClose,
@@ -24,16 +26,37 @@ export function Sidebar({
   onTogglePin,
   isMobileOpen,
   onCloseMobile,
-  activeItem = "settings",
+  activeItem,
   onSelectItem,
 }: SidebarProps) {
   const t = useTranslations("sidebar");
+  const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
 
   // MongoDB-style dynamic hover expansion:
   // When pinned open, stays open (w-64).
   // When shrinked (w-16), hovering expands smoothly to w-64, mouse leave shrinks back to w-16.
   const isExpanded = isPinnedExpanded || isHovered;
+
+  const navItems = [
+    {
+      id: "dashboard",
+      label: t("dashboard"),
+      href: "/dashboard",
+      icon: LayoutDashboard,
+      isActive:
+        pathname === "/dashboard" ||
+        pathname === "/" ||
+        activeItem === "dashboard",
+    },
+    {
+      id: "settings",
+      label: t("settings"),
+      href: "/settings",
+      icon: Settings,
+      isActive: pathname === "/settings" || activeItem === "settings",
+    },
+  ];
 
   return (
     <>
@@ -136,41 +159,47 @@ export function Sidebar({
           )}
         </div>
 
-        {/* Sidebar Nav Items (Only "Settings" as requested) */}
-        <div className="flex-1 overflow-y-auto py-3 px-2 space-y-1">
-          <button
-            type="button"
-            onClick={() => {
-              if (onSelectItem) onSelectItem("settings");
-              if (isMobileOpen) onCloseMobile();
-            }}
-            className={`
-              w-full flex items-center rounded-lg text-xs font-normal
-              transition-all duration-200 cursor-pointer outline-none
-              ${
-                isExpanded || isMobileOpen
-                  ? "justify-start px-2.5 py-2 gap-3"
-                  : "justify-center h-10 px-0"
-              }
-              ${
-                activeItem === "settings"
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-xs font-normal"
-                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
-              }
-            `}
-            title={!isExpanded ? t("settings") : undefined}
-          >
-            <Settings className="h-4 w-4 shrink-0" />
+        {/* Sidebar Nav Items (1. Dashboard, 2. Settings) */}
+        <div className="flex-1 overflow-y-auto py-3 px-2 space-y-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={() => {
+                  if (onSelectItem) onSelectItem(item.id);
+                  if (isMobileOpen) onCloseMobile();
+                }}
+                className={`
+                  w-full flex items-center rounded-lg text-xs font-normal
+                  transition-all duration-200 cursor-pointer outline-none select-none
+                  ${
+                    isExpanded || isMobileOpen
+                      ? "justify-start px-2.5 py-2 gap-3"
+                      : "justify-center h-10 px-0"
+                  }
+                  ${
+                    item.isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-xs"
+                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }
+                `}
+                title={!isExpanded ? item.label : undefined}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
 
-            {(isExpanded || isMobileOpen) && (
-              <span className="whitespace-nowrap transition-all duration-200 animate-in fade-in">
-                {t("settings")}
-              </span>
-            )}
-          </button>
+                {(isExpanded || isMobileOpen) && (
+                  <span className="whitespace-nowrap transition-all duration-200 animate-in fade-in">
+                    {item.label}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </div>
 
-        {/* Bottom Area - Keep blank & clean as requested */}
+        {/* Bottom Area - Clean as requested */}
         <div className="h-4 shrink-0" />
       </aside>
     </>

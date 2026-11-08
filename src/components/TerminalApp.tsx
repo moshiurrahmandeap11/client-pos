@@ -25,7 +25,11 @@ import {
   Store,
 } from "lucide-react";
 
-export function TerminalApp() {
+interface TerminalAppProps {
+  initialView?: "dashboard" | "settings";
+}
+
+export function TerminalApp({ initialView }: TerminalAppProps) {
   const t = useTranslations("auth");
   const { user, isLoading, isSubmitting, error, login } = useAuth();
 
@@ -97,7 +101,7 @@ export function TerminalApp() {
 
   // Stable Dashboard View (no morphing underway)
   if (displayedView === "dashboard" && !isMorphing && user) {
-    return <DashboardLayout />;
+    return <DashboardLayout initialView={initialView} />;
   }
 
   // Morphing Container or Login View
@@ -130,7 +134,7 @@ export function TerminalApp() {
               ${isMorphing ? "opacity-90 animate-in fade-in duration-500" : "opacity-100"}
             `}
           >
-            <DashboardLayout />
+            <DashboardLayout initialView={initialView} />
           </div>
         ) : (
           /* Login Card View */
