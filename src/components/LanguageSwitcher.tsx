@@ -34,13 +34,13 @@ export function LanguageSwitcher() {
     <Button
       variant="ghost"
       size="sm"
-      className="h-8 gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+      className="h-8 gap-1.5 px-2.5 text-xs font-normal text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
       onClick={toggleLanguage}
       disabled={isPending}
       aria-label="Switch language"
     >
       <Languages className={`h-3.5 w-3.5 transition-opacity ${isPending ? "opacity-50" : ""}`} />
-      <span className="w-12 text-center inline-block select-none">
+      <span className="w-12 text-center inline-block select-none font-normal">
         {locale === "en" ? "বাংলা" : "English"}
       </span>
     </Button>

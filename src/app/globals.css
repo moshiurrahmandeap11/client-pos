@@ -151,19 +151,25 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    font-weight: 400;
   }
   html {
     font-family: var(--font-sans);
     line-height: 1.5;
+    font-weight: 400;
   }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     line-height: 1.5;
+    font-weight: 400;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 400;
   }
 }
 
-/* Force Li Ador Noirrit font on Bengali mode across all text and components */
+/* Force Li Ador Noirrit font on Bengali mode with clean, non-bold 400 regular weight */
 html[lang="bn"],
 [data-locale="bn"],
 .font-bengali,
@@ -171,6 +177,7 @@ html[lang="bn"] *,
 [data-locale="bn"] *,
 .font-bengali * {
   font-family: 'Li Ador Noirrit', var(--font-bengali), var(--font-poppins), system-ui, sans-serif !important;
+  font-weight: 400 !important;
   --font-heading: 'Li Ador Noirrit', var(--font-bengali), var(--font-poppins), system-ui, sans-serif;
   --font-sans: 'Li Ador Noirrit', var(--font-bengali), var(--font-poppins), system-ui, sans-serif;
 }
