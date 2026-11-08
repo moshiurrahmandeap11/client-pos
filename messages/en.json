@@ -27,5 +27,32 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "systemStatus": "Terminal Online",
+    "settingsTitle": "Station Settings",
+    "settingsDesc": "Configure terminal preferences and system options",
+    "overview": "Overview",
+    "activeSession": "Authenticated Session",
+    "readyText": "Apex Retail POS Engine is ready for sales processing."
+  },
+  "sidebar": {
+    "brand": "Apex POS",
+    "settings": "Settings",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "closeMenu": "Close menu"
+  },
+  "topbar": {
+    "terminal": "Terminal #01",
+    "profile": "Profile",
+    "logout": "Log Out",
+    "loggingOut": "Logging out...",
+    "role": "Role",
+    "profileTitle": "Operator Profile",
+    "permissionsCount": "Active Permissions",
+    "close": "Close"
   }
 }
