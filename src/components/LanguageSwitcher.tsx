@@ -1,0 +1,30 @@
+"use client";
+
+import { useLocale } from "next-intl";
+import { usePathname, useRouter } from "@/i18n/routing";
+import { Button } from "@/components/ui/button";
+import { Languages } from "lucide-react";
+
+export function LanguageSwitcher() {
+  const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const toggleLanguage = () => {
+    const nextLocale = locale === "en" ? "bn" : "en";
+    router.replace(pathname, { locale: nextLocale });
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="h-8 gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground cursor-pointer"
+      onClick={toggleLanguage}
+      aria-label="Switch language"
+    >
+      <Languages className="h-3.5 w-3.5" />
+      <span>{locale === "en" ? "বাংলা" : "English"}</span>
+    </Button>
+  );
+}
