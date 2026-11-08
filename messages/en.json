@@ -65,5 +65,12 @@
     "profileTitle": "Operator Profile",
     "permissionsCount": "Active Permissions",
     "close": "Close"
+  },
+  "notFound": {
+    "badge": "404 Error",
+    "title": "Terminal Screen Not Found",
+    "description": "The requested screen or resource was not found on this POS station. It may have been relocated, removed, or typed incorrectly.",
+    "backHome": "Back to Dashboard",
+    "settings": "Station Settings"
   }
 }
