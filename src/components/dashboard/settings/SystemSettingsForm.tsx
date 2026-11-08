@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Sliders,
   Save,
   Loader2,
 } from "lucide-react";
@@ -109,21 +108,14 @@ export function SystemSettingsForm() {
 
   return (
     <div className="w-full space-y-6">
-      {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Sliders className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-normal text-foreground tracking-tight">
-              {t("systemSettings")}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Configure global system parameters, accounting policies, localization, and station defaults.
-            </p>
-          </div>
-        </div>
+      {/* Section Header - Clean with no icon next to title */}
+      <div className="pb-3 border-b border-border/50">
+        <h1 className="text-xl sm:text-2xl font-normal text-foreground tracking-tight">
+          {t("systemSettings")}
+        </h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Configure global system parameters, accounting policies, localization, and station defaults.
+        </p>
       </div>
 
       {/* Settings Form Grid - Full Width & Fully Responsive */}
@@ -145,7 +137,7 @@ export function SystemSettingsForm() {
               />
             </div>
 
-            {/* 2. Language */}
+            {/* 2. Language (English & Bengali only) */}
             <div className="space-y-1.5">
               <Label htmlFor="language" className="text-xs font-normal text-foreground">
                 Language <span className="text-destructive">*</span>
@@ -158,7 +150,6 @@ export function SystemSettingsForm() {
               >
                 <option value="English">English</option>
                 <option value="Bengali">Bengali (বাংলা)</option>
-                <option value="Arabic">Arabic (العربية)</option>
               </select>
             </div>
 

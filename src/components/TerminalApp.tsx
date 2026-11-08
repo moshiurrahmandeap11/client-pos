@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSettings } from "@/hooks/useSettings";
 import { useTranslations } from "next-intl";
@@ -24,6 +24,9 @@ import {
   Eye,
   EyeOff,
   Store,
+  RotateCw,
+  AlertTriangle,
+  ShieldCheck,
 } from "lucide-react";
 
 interface TerminalAppProps {
@@ -39,6 +42,30 @@ export function TerminalApp({ initialView, settingsTab }: TerminalAppProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  // Captcha state when enabled in System Settings
+  const isCaptchaEnabled = settings?.loginCaptcha?.toLowerCase() === "enable";
+  const [captchaCode, setCaptchaCode] = useState("");
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
+
+  // Helper to generate a random 5-character security captcha
+  const generateCaptcha = useCallback(() => {
+    const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // exclude easily confused chars like 0, O, 1, I
+    let result = "";
+    for (let i = 0; i < 5; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCaptchaCode(result);
+    setCaptchaInput("");
+    setCaptchaError(null);
+  }, []);
+
+  useEffect(() => {
+    if (isCaptchaEnabled) {
+      generateCaptcha();
+    }
+  }, [isCaptchaEnabled, generateCaptcha]);
 
   // Morphing animation states
   const [displayedView, setDisplayedView] = useState<"login" | "dashboard">(
@@ -78,10 +105,33 @@ export function TerminalApp({ initialView, settingsTab }: TerminalAppProps) {
     e.preventDefault();
     if (!email.trim() || !password.trim()) return;
 
+    // Verify captcha if enabled in System Settings
+    if (isCaptchaEnabled) {
+      if (!captchaInput.trim()) {
+        setCaptchaError(
+          settings.language?.toLowerCase().includes("bengali")
+            ? "দয়া করে ক্যাপচা কোডটি পূরণ করুন।"
+            : "Please enter the security captcha."
+        );
+        return;
+      }
+      if (captchaInput.trim().toUpperCase() !== captchaCode.toUpperCase()) {
+        setCaptchaError(
+          settings.language?.toLowerCase().includes("bengali")
+            ? "ভুল ক্যাপচা কোড। নতুন কোড দিয়ে চেষ্টা করুন।"
+            : "Incorrect captcha code. Please try again."
+        );
+        generateCaptcha();
+        return;
+      }
+    }
+
     try {
       await login({ email: email.trim(), password });
     } catch {
-      // Error handled in useAuth
+      if (isCaptchaEnabled) {
+        generateCaptcha();
+      }
     }
   };
 
@@ -157,6 +207,18 @@ export function TerminalApp({ initialView, settingsTab }: TerminalAppProps) {
                 <ThemeToggle />
               </div>
             </div>
+
+            {/* Maintenance Mode Notice on Login Screen */}
+            {settings?.maintenanceMode === "Yes" && (
+              <div className="flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-xs text-amber-700 dark:text-amber-300 font-normal mb-4 animate-in fade-in">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                <span>
+                  {settings.language?.toLowerCase().includes("bengali")
+                    ? "সিস্টেমটি বর্তমানে রক্ষণাবেক্ষণ মোডে রয়েছে। শুধুমাত্র অনুমোদিত অ্যাডমিনিস্ট্রেটর লগইন করতে পারবেন।"
+                    : "System is in Maintenance Mode. Only authorized administrators may sign in."}
+                </span>
+              </div>
+            )}
 
             {/* Header */}
             <CardHeader className="p-0 pb-6 text-center space-y-1.5">
@@ -235,6 +297,77 @@ export function TerminalApp({ initialView, settingsTab }: TerminalAppProps) {
                   </button>
                 </div>
               </div>
+
+              {/* Security Captcha Field (Dynamically rendered and enforced when enabled) */}
+              {isCaptchaEnabled && (
+                <div className="space-y-1.5 pt-1 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between h-4 leading-none">
+                    <Label
+                      htmlFor="captchaInput"
+                      className="text-xs text-muted-foreground font-normal block"
+                    >
+                      {settings.language?.toLowerCase().includes("bengali")
+                        ? "নিরাপত্তা ক্যাপচা *"
+                        : "Security Captcha *"}
+                    </Label>
+                    <button
+                      type="button"
+                      onClick={generateCaptcha}
+                      className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+                      title="Reload Captcha"
+                    >
+                      <RotateCw className="h-3 w-3" />
+                      <span>
+                        {settings.language?.toLowerCase().includes("bengali")
+                          ? "নতুন কোড"
+                          : "Refresh"}
+                      </span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Visual Captcha Box */}
+                    <div
+                      className="h-9 px-3 flex items-center justify-center rounded-md border border-border/80 bg-muted/60 select-none tracking-[0.35em] font-mono text-sm font-normal text-foreground relative overflow-hidden shadow-2xs"
+                      style={{
+                        backgroundImage:
+                          "radial-gradient(var(--border) 1px, transparent 0)",
+                        backgroundSize: "6px 6px",
+                      }}
+                    >
+                      <span className="italic">{captchaCode}</span>
+                    </div>
+
+                    {/* Captcha Input */}
+                    <div className="flex-1">
+                      <Input
+                        id="captchaInput"
+                        type="text"
+                        placeholder={
+                          settings.language?.toLowerCase().includes("bengali")
+                            ? "কোড লিখুন"
+                            : "Enter code"
+                        }
+                        value={captchaInput}
+                        onChange={(e) => {
+                          setCaptchaInput(e.target.value);
+                          if (captchaError) setCaptchaError(null);
+                        }}
+                        maxLength={5}
+                        required
+                        className="text-xs h-9 uppercase font-mono tracking-wider font-normal"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </div>
+
+                  {captchaError && (
+                    <p className="text-[11px] text-destructive font-normal animate-in fade-in">
+                      {captchaError}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Submit Button */}
               <div className="pt-2">

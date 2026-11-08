@@ -377,21 +377,14 @@ export function DashboardContent({
 
   return (
     <div className="w-full space-y-6">
-      {/* Module Title Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <CurrentIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-normal text-foreground tracking-tight">
-              {currentTab.title}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {currentTab.description}
-            </p>
-          </div>
-        </div>
+      {/* Module Title Header - Clean with no box icon */}
+      <div className="pb-3 border-b border-border/50">
+        <h1 className="text-xl sm:text-2xl font-normal text-foreground tracking-tight">
+          {currentTab.title}
+        </h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {currentTab.description}
+        </p>
       </div>
 
       {/* Module Workspace Container */}
