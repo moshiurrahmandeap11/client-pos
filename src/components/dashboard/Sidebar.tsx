@@ -163,7 +163,7 @@ export function Sidebar({
 
             {/* Brand Title (Visible only when expanded, dynamically reflects Site Name) */}
             {(isExpanded || isMobileOpen) && (
-              <span className="text-sm font-normal text-sidebar-foreground tracking-tight whitespace-nowrap animate-in fade-in duration-200">
+              <span className="text-sm sm:text-[14.5px] font-normal text-sidebar-foreground tracking-tight whitespace-nowrap animate-in fade-in duration-200">
                 {settings?.siteName || t("brand")}
               </span>
             )}
@@ -209,7 +209,7 @@ export function Sidebar({
               if (isMobileOpen) onCloseMobile();
             }}
             className={`
-              w-full flex items-center rounded-lg text-xs font-normal
+              w-full flex items-center rounded-lg text-xs sm:text-[13.5px] font-normal
               transition-all duration-200 cursor-pointer outline-none select-none
               ${
                 isExpanded || isMobileOpen
@@ -245,7 +245,7 @@ export function Sidebar({
                 }
               }}
               className={`
-                w-full flex items-center rounded-lg text-xs font-normal
+                w-full flex items-center rounded-lg text-xs sm:text-[13.5px] font-normal
                 transition-all duration-200 cursor-pointer outline-none select-none
                 ${
                   isExpanded || isMobileOpen
@@ -313,7 +313,7 @@ export function Sidebar({
                             : "0ms",
                         }}
                         className={`
-                          w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[11px] font-normal
+                          w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-xs sm:text-[12.5px] font-normal
                           transition-all duration-200 cursor-pointer outline-none select-none
                           ${
                             isSubActive

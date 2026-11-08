@@ -182,6 +182,44 @@ html[lang="bn"] *,
   --font-sans: 'Li Ador Noirrit', var(--font-bengali), var(--font-poppins), system-ui, sans-serif;
 }
 
+/* Enhanced Bengali Typography:
+   Bengali script glyphs have lower x-height and complex conjuncts (যুক্তাক্ষর).
+   Scaling up ensures sharp readability and comfortable viewing across the entire application. */
+html[lang="bn"],
+[data-locale="bn"] {
+  font-size: 104%;
+}
+
+html[lang="bn"] .text-\[11px\],
+[data-locale="bn"] .text-\[11px\] {
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+html[lang="bn"] .text-xs,
+[data-locale="bn"] .text-xs {
+  font-size: 13.5px !important;
+  line-height: 1.45 !important;
+}
+
+html[lang="bn"] label,
+[data-locale="bn"] label {
+  font-size: 13.5px !important;
+  letter-spacing: 0.01em !important;
+}
+
+html[lang="bn"] select,
+[data-locale="bn"] select,
+html[lang="bn"] input,
+[data-locale="bn"] input {
+  font-size: 13px !important;
+}
+
+html[lang="bn"] button,
+[data-locale="bn"] button {
+  font-size: 13.5px !important;
+}
+
 /* Circular Expanding View Transition Ripple */
 ::view-transition-old(root),
 ::view-transition-new(root) {

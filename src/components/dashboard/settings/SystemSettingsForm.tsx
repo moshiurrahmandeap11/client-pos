@@ -91,7 +91,7 @@ export function SystemSettingsForm() {
     return (
       <Card className="w-full border-border bg-card p-10 flex flex-col items-center justify-center space-y-3">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        <p className="text-xs text-muted-foreground font-normal">
+        <p className="text-xs sm:text-[13px] text-muted-foreground font-normal">
           {t("loading")}
         </p>
       </Card>
@@ -100,7 +100,7 @@ export function SystemSettingsForm() {
 
   // Consistent select dropdown styling with clean non-bold font
   const selectClassName =
-    "h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground font-normal outline-none transition-colors focus:border-ring focus:ring-1 focus:ring-ring cursor-pointer";
+    "h-9.5 w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs sm:text-[13px] text-foreground font-normal outline-none transition-colors focus:border-ring focus:ring-1 focus:ring-ring cursor-pointer";
 
   const isBn = currentLocale === "bn";
 
@@ -111,7 +111,7 @@ export function SystemSettingsForm() {
         <h1 className="text-xl sm:text-2xl font-normal text-foreground tracking-tight">
           {t("title")}
         </h1>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <p className="text-xs sm:text-[13.5px] text-muted-foreground mt-0.5">
           {t("subtitle")}
         </p>
       </div>
@@ -122,7 +122,7 @@ export function SystemSettingsForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
             {/* 1. Site Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="siteName" className="text-xs font-normal text-foreground">
+              <Label htmlFor="siteName" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("siteName")} <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -131,13 +131,13 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("siteName", e.target.value)}
                 placeholder={t("siteNamePlaceholder")}
                 required
-                className="text-xs h-9 font-normal"
+                className="text-xs sm:text-[13px] h-9.5 font-normal"
               />
             </div>
 
             {/* 2. Language (English & Bengali only) */}
             <div className="space-y-1.5">
-              <Label htmlFor="language" className="text-xs font-normal text-foreground">
+              <Label htmlFor="language" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("language")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -153,7 +153,7 @@ export function SystemSettingsForm() {
 
             {/* 3. Default Currency */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultCurrency" className="text-xs font-normal text-foreground">
+              <Label htmlFor="defaultCurrency" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultCurrency")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -174,7 +174,7 @@ export function SystemSettingsForm() {
 
             {/* 4. Accounting Method */}
             <div className="space-y-1.5">
-              <Label htmlFor="accountingMethod" className="text-xs font-normal text-foreground">
+              <Label htmlFor="accountingMethod" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("accountingMethod")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -197,7 +197,7 @@ export function SystemSettingsForm() {
 
             {/* 5. Default Email */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultEmail" className="text-xs font-normal text-foreground">
+              <Label htmlFor="defaultEmail" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultEmail")} <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -207,13 +207,13 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("defaultEmail", e.target.value)}
                 placeholder={t("defaultEmailPlaceholder")}
                 required
-                className="text-xs h-9 font-normal"
+                className="text-xs sm:text-[13px] h-9.5 font-normal"
               />
             </div>
 
             {/* 6. Default Customer Group */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultCustomerGroup" className="text-xs font-normal text-foreground">
+              <Label htmlFor="defaultCustomerGroup" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultCustomerGroup")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -231,7 +231,7 @@ export function SystemSettingsForm() {
 
             {/* 7. Default Price Group */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultPriceGroup" className="text-xs font-normal text-foreground">
+              <Label htmlFor="defaultPriceGroup" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultPriceGroup")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -248,7 +248,7 @@ export function SystemSettingsForm() {
 
             {/* 8. Maintenance Mode */}
             <div className="space-y-1.5">
-              <Label htmlFor="maintenanceMode" className="text-xs font-normal text-foreground">
+              <Label htmlFor="maintenanceMode" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("maintenanceMode")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -264,7 +264,7 @@ export function SystemSettingsForm() {
 
             {/* 9. Theme with Liquid Ripple Animation */}
             <div className="space-y-1.5">
-              <Label htmlFor="theme" className="text-xs font-normal text-foreground">
+              <Label htmlFor="theme" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("theme")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -289,7 +289,7 @@ export function SystemSettingsForm() {
 
             {/* 10. RTL Support */}
             <div className="space-y-1.5">
-              <Label htmlFor="rtlSupport" className="text-xs font-normal text-foreground">
+              <Label htmlFor="rtlSupport" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("rtlSupport")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -305,7 +305,7 @@ export function SystemSettingsForm() {
 
             {/* 11. Login Captcha */}
             <div className="space-y-1.5">
-              <Label htmlFor="loginCaptcha" className="text-xs font-normal text-foreground">
+              <Label htmlFor="loginCaptcha" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("loginCaptcha")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -321,7 +321,7 @@ export function SystemSettingsForm() {
 
             {/* 12. Number of days to disable editing */}
             <div className="space-y-1.5">
-              <Label htmlFor="numberDaysDisableEditing" className="text-xs font-normal text-foreground">
+              <Label htmlFor="numberDaysDisableEditing" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("numberDaysDisableEditing")} <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -331,13 +331,13 @@ export function SystemSettingsForm() {
                 value={formData.numberDaysDisableEditing}
                 onChange={(e) => handleChange("numberDaysDisableEditing", e.target.value)}
                 required
-                className="text-xs h-9 font-normal"
+                className="text-xs sm:text-[13px] h-9.5 font-normal"
               />
             </div>
 
             {/* 13. Rows per page */}
             <div className="space-y-1.5">
-              <Label htmlFor="rowsPerPage" className="text-xs font-normal text-foreground">
+              <Label htmlFor="rowsPerPage" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("rowsPerPage")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -355,7 +355,7 @@ export function SystemSettingsForm() {
 
             {/* 14. Date Format */}
             <div className="space-y-1.5">
-              <Label htmlFor="dateFormat" className="text-xs font-normal text-foreground">
+              <Label htmlFor="dateFormat" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("dateFormat")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -373,7 +373,7 @@ export function SystemSettingsForm() {
 
             {/* 15. Timezone */}
             <div className="space-y-1.5">
-              <Label htmlFor="timezone" className="text-xs font-normal text-foreground">
+              <Label htmlFor="timezone" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("timezone")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -394,7 +394,7 @@ export function SystemSettingsForm() {
 
             {/* 16. Calender */}
             <div className="space-y-1.5">
-              <Label htmlFor="calender" className="text-xs font-normal text-foreground">
+              <Label htmlFor="calender" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("calender")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -410,7 +410,7 @@ export function SystemSettingsForm() {
 
             {/* 17. Default Warehouse */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultWarehouse" className="text-xs font-normal text-foreground">
+              <Label htmlFor="defaultWarehouse" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultWarehouse")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -427,7 +427,7 @@ export function SystemSettingsForm() {
 
             {/* 18. Default Biller */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultBiller" className="text-xs font-normal text-foreground">
+              <Label htmlFor="defaultBiller" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultBiller")} <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -436,13 +436,13 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("defaultBiller", e.target.value)}
                 placeholder={t("defaultBillerPlaceholder")}
                 required
-                className="text-xs h-9 font-normal"
+                className="text-xs sm:text-[13px] h-9.5 font-normal"
               />
             </div>
 
             {/* 19. PDF Library */}
             <div className="space-y-1.5">
-              <Label htmlFor="pdfLibrary" className="text-xs font-normal text-foreground">
+              <Label htmlFor="pdfLibrary" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("pdfLibrary")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -459,7 +459,7 @@ export function SystemSettingsForm() {
 
             {/* 20. Use code for slug */}
             <div className="space-y-1.5">
-              <Label htmlFor="useCodeForSlug" className="text-xs font-normal text-foreground">
+              <Label htmlFor="useCodeForSlug" className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("useCodeForSlug")} <span className="text-destructive">*</span>
               </Label>
               <select
@@ -476,7 +476,7 @@ export function SystemSettingsForm() {
 
           {/* Action Footer */}
           <div className="pt-4 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-muted-foreground font-normal">
+            <p className="text-xs sm:text-[13px] text-muted-foreground font-normal">
               {t("notice")}
             </p>
 
@@ -484,7 +484,7 @@ export function SystemSettingsForm() {
               <Button
                 type="submit"
                 disabled={isSaving}
-                className="w-full sm:w-auto gap-2 text-xs font-normal h-9.5 px-5 cursor-pointer"
+                className="w-full sm:w-auto gap-2 text-xs sm:text-[13px] font-normal h-10 px-5 cursor-pointer"
               >
                 {isSaving ? (
                   <>
