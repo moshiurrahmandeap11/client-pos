@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Save,
   Loader2,
 } from "lucide-react";
@@ -40,6 +47,7 @@ export function SystemSettingsForm() {
     }
   }, [settings]);
 
+  // Handle standard text input changes
   const handleChange = (
     field: keyof SystemSettingsData,
     value: string | number
@@ -50,6 +58,56 @@ export function SystemSettingsForm() {
     }));
   };
 
+  // Immediate auto-save handler for all dropdown selections
+  const handleDropdownChange = async (
+    field: keyof SystemSettingsData,
+    value: string
+  ) => {
+    // 1. Immediately update local form data state
+    const updatedForm: SystemSettingsData = {
+      ...formData,
+      [field]: field === "rowsPerPage" ? Number(value) : value,
+    };
+    setFormData(updatedForm);
+
+    // 2. If changing theme, trigger smooth circular expanding ripple transition
+    if (field === "theme") {
+      changeThemeWithAnimation(value);
+    }
+
+    // 3. Auto-save to remote database without requiring button click
+    try {
+      const payload: Partial<SystemSettingsData> = {
+        ...updatedForm,
+        numberDaysDisableEditing: Number(updatedForm.numberDaysDisableEditing) || 0,
+        rowsPerPage: Number(updatedForm.rowsPerPage) || 10,
+      };
+
+      await updateSettings(payload);
+      toast.success(t("successMessage"));
+
+      // If language changed, transition locale route immediately
+      if (field === "language") {
+        const targetLocale =
+          value.toLowerCase().includes("bengali") ||
+          value.toLowerCase().includes("bangla")
+            ? "bn"
+            : "en";
+
+        if (targetLocale !== currentLocale) {
+          if (typeof document !== "undefined") {
+            document.documentElement.lang = targetLocale;
+            document.documentElement.setAttribute("data-locale", targetLocale);
+          }
+          router.replace(pathname, { locale: targetLocale });
+        }
+      }
+    } catch (err: any) {
+      toast.error(err.message || t("errorMessage"));
+    }
+  };
+
+  // Full form submission (for text fields like Site Name, Email, Biller, Days)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -98,10 +156,6 @@ export function SystemSettingsForm() {
     );
   }
 
-  // Consistent select dropdown styling with clean non-bold font
-  const selectClassName =
-    "h-9.5 w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs sm:text-[13px] text-foreground font-normal outline-none transition-colors focus:border-ring focus:ring-1 focus:ring-ring cursor-pointer";
-
   const isBn = currentLocale === "bn";
 
   return (
@@ -137,62 +191,79 @@ export function SystemSettingsForm() {
 
             {/* 2. Language (English & Bengali only) */}
             <div className="space-y-1.5">
-              <Label htmlFor="language" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("language")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="language"
+              <Select
                 value={formData.language}
-                onChange={(e) => handleChange("language", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("language", val);
+                }}
               >
-                <option value="English">English</option>
-                <option value="Bengali">{isBn ? "বাংলা (Bengali)" : "Bengali (বাংলা)"}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="English">English</SelectItem>
+                  <SelectItem value="Bengali">
+                    {isBn ? "বাংলা (Bengali)" : "Bengali (বাংলা)"}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 3. Default Currency */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultCurrency" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultCurrency")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="defaultCurrency"
+              <Select
                 value={formData.defaultCurrency}
-                onChange={(e) => handleChange("defaultCurrency", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("defaultCurrency", val);
+                }}
               >
-                <option value="BDT">{isBn ? "বিডিটি (৳ - বাংলাদেশি টাকা)" : "BDT (৳ - Bangladeshi Taka)"}</option>
-                <option value="USD">{isBn ? "ইউএসডি ($ - মার্কিন ডলার)" : "USD ($ - US Dollar)"}</option>
-                <option value="EUR">{isBn ? "ইউরো (€ - ইউরোপীয় ইউরো)" : "EUR (€ - Euro)"}</option>
-                <option value="GBP">{isBn ? "জিবিপি (£ - ব্রিটিশ পাউন্ড)" : "GBP (£ - British Pound)"}</option>
-                <option value="INR">{isBn ? "আইএনআর (₹ - ভারতীয় রুপি)" : "INR (₹ - Indian Rupee)"}</option>
-                <option value="SAR">{isBn ? "এসএআর (﷼ - সৌদি রিয়াল)" : "SAR (﷼ - Saudi Riyal)"}</option>
-                <option value="AED">{isBn ? "এইডি (د.إ - আমিরাত দিরহাম)" : "AED (د.إ - UAE Dirham)"}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="BDT">{isBn ? "বিডিটি (৳ - বাংলাদেশি টাকা)" : "BDT (৳ - Bangladeshi Taka)"}</SelectItem>
+                  <SelectItem value="USD">{isBn ? "ইউএসডি ($ - মার্কিন ডলার)" : "USD ($ - US Dollar)"}</SelectItem>
+                  <SelectItem value="EUR">{isBn ? "ইউরো (€ - ইউরোপীয় ইউরো)" : "EUR (€ - Euro)"}</SelectItem>
+                  <SelectItem value="GBP">{isBn ? "জিবিপি (£ - ব্রিটিশ পাউন্ড)" : "GBP (£ - British Pound)"}</SelectItem>
+                  <SelectItem value="INR">{isBn ? "আইএনআর (₹ - ভারতীয় রুপি)" : "INR (₹ - Indian Rupee)"}</SelectItem>
+                  <SelectItem value="SAR">{isBn ? "এসএআর (﷼ - সৌদি রিয়াল)" : "SAR (﷼ - Saudi Riyal)"}</SelectItem>
+                  <SelectItem value="AED">{isBn ? "এইডি (د.إ - আমিরাত দিরহাম)" : "AED (د.إ - UAE Dirham)"}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 4. Accounting Method */}
             <div className="space-y-1.5">
-              <Label htmlFor="accountingMethod" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("accountingMethod")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="accountingMethod"
+              <Select
                 value={formData.accountingMethod}
-                onChange={(e) => handleChange("accountingMethod", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("accountingMethod", val);
+                }}
               >
-                <option value="AVCO (Average Cost Method)">
-                  {isBn ? "এভকো (AVCO - গড় খরচ পদ্ধতি)" : "AVCO (Average Cost Method)"}
-                </option>
-                <option value="FIFO (First In First Out)">
-                  {isBn ? "ফিফো (FIFO - আগে আসা পণ্য আগে বিক্রি)" : "FIFO (First In First Out)"}
-                </option>
-                <option value="LIFO (Last In First Out)">
-                  {isBn ? "লিফো (LIFO - পরে আসা পণ্য আগে বিক্রি)" : "LIFO (Last In First Out)"}
-                </option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="AVCO (Average Cost Method)">
+                    {isBn ? "এভকো (AVCO - গড় খরচ পদ্ধতি)" : "AVCO (Average Cost Method)"}
+                  </SelectItem>
+                  <SelectItem value="FIFO (First In First Out)">
+                    {isBn ? "ফিফো (FIFO - আগে আসা পণ্য আগে বিক্রি)" : "FIFO (First In First Out)"}
+                  </SelectItem>
+                  <SelectItem value="LIFO (Last In First Out)">
+                    {isBn ? "লিফো (LIFO - পরে আসা পণ্য আগে বিক্রি)" : "LIFO (Last In First Out)"}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 5. Default Email */}
@@ -213,110 +284,132 @@ export function SystemSettingsForm() {
 
             {/* 6. Default Customer Group */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultCustomerGroup" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultCustomerGroup")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="defaultCustomerGroup"
+              <Select
                 value={formData.defaultCustomerGroup}
-                onChange={(e) => handleChange("defaultCustomerGroup", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("defaultCustomerGroup", val);
+                }}
               >
-                <option value="General">{isBn ? "সাধারণ (General)" : "General"}</option>
-                <option value="Retail">{isBn ? "খুচরা (Retail)" : "Retail"}</option>
-                <option value="Wholesale">{isBn ? "পাইকারি (Wholesale)" : "Wholesale"}</option>
-                <option value="VIP">{isBn ? "ভিআইপি (VIP)" : "VIP"}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="General">{isBn ? "সাধারণ (General)" : "General"}</SelectItem>
+                  <SelectItem value="Retail">{isBn ? "খুচরা (Retail)" : "Retail"}</SelectItem>
+                  <SelectItem value="Wholesale">{isBn ? "পাইকারি (Wholesale)" : "Wholesale"}</SelectItem>
+                  <SelectItem value="VIP">{isBn ? "ভিআইপি (VIP)" : "VIP"}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 7. Default Price Group */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultPriceGroup" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultPriceGroup")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="defaultPriceGroup"
+              <Select
                 value={formData.defaultPriceGroup}
-                onChange={(e) => handleChange("defaultPriceGroup", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("defaultPriceGroup", val);
+                }}
               >
-                <option value="Default">{isBn ? "ডিফল্ট (Default)" : "Default"}</option>
-                <option value="Retail Tier 1">{isBn ? "খুচরা টায়ার ১ (Retail Tier 1)" : "Retail Tier 1"}</option>
-                <option value="Wholesale Tier 2">{isBn ? "পাইকারি টায়ার ২ (Wholesale Tier 2)" : "Wholesale Tier 2"}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Default">{isBn ? "ডিফল্ট (Default)" : "Default"}</SelectItem>
+                  <SelectItem value="Retail Tier 1">{isBn ? "খুচরা টায়ার ১ (Retail Tier 1)" : "Retail Tier 1"}</SelectItem>
+                  <SelectItem value="Wholesale Tier 2">{isBn ? "পাইকারি টায়ার ২ (Wholesale Tier 2)" : "Wholesale Tier 2"}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 8. Maintenance Mode */}
             <div className="space-y-1.5">
-              <Label htmlFor="maintenanceMode" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("maintenanceMode")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="maintenanceMode"
+              <Select
                 value={formData.maintenanceMode}
-                onChange={(e) => handleChange("maintenanceMode", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("maintenanceMode", val);
+                }}
               >
-                <option value="No">{t("no")}</option>
-                <option value="Yes">{t("yes")}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="No">{t("no")}</SelectItem>
+                  <SelectItem value="Yes">{t("yes")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 9. Theme with Liquid Ripple Animation */}
             <div className="space-y-1.5">
-              <Label htmlFor="theme" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("theme")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="theme"
+              <Select
                 value={formData.theme}
-                onChange={(e) => {
-                  const newTheme = e.target.value;
-                  handleChange("theme", newTheme);
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  changeThemeWithAnimation(newTheme, {
-                    x: rect.left + rect.width / 2,
-                    y: rect.top + rect.height / 2,
-                  });
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("theme", val);
                 }}
-                className={selectClassName}
               >
-                <option value="Default">{t("themeDefault")}</option>
-                <option value="Light">{t("themeLight")}</option>
-                <option value="Dark">{t("themeDark")}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Default">{t("themeDefault")}</SelectItem>
+                  <SelectItem value="Light">{t("themeLight")}</SelectItem>
+                  <SelectItem value="Dark">{t("themeDark")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 10. RTL Support */}
             <div className="space-y-1.5">
-              <Label htmlFor="rtlSupport" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("rtlSupport")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="rtlSupport"
+              <Select
                 value={formData.rtlSupport}
-                onChange={(e) => handleChange("rtlSupport", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("rtlSupport", val);
+                }}
               >
-                <option value="Disable">{t("disable")}</option>
-                <option value="Enable">{t("enable")}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Disable">{t("disable")}</SelectItem>
+                  <SelectItem value="Enable">{t("enable")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 11. Login Captcha */}
             <div className="space-y-1.5">
-              <Label htmlFor="loginCaptcha" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("loginCaptcha")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="loginCaptcha"
+              <Select
                 value={formData.loginCaptcha}
-                onChange={(e) => handleChange("loginCaptcha", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("loginCaptcha", val);
+                }}
               >
-                <option value="Disable">{t("disable")}</option>
-                <option value="Enable">{t("enable")}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Disable">{t("disable")}</SelectItem>
+                  <SelectItem value="Enable">{t("enable")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 12. Number of days to disable editing */}
@@ -337,92 +430,117 @@ export function SystemSettingsForm() {
 
             {/* 13. Rows per page */}
             <div className="space-y-1.5">
-              <Label htmlFor="rowsPerPage" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("rowsPerPage")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="rowsPerPage"
-                value={formData.rowsPerPage}
-                onChange={(e) => handleChange("rowsPerPage", e.target.value)}
-                className={selectClassName}
+              <Select
+                value={String(formData.rowsPerPage)}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("rowsPerPage", val);
+                }}
               >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 14. Date Format */}
             <div className="space-y-1.5">
-              <Label htmlFor="dateFormat" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("dateFormat")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="dateFormat"
+              <Select
                 value={formData.dateFormat}
-                onChange={(e) => handleChange("dateFormat", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("dateFormat", val);
+                }}
               >
-                <option value="dd-mm-yyyy">dd-mm-yyyy (08-11-2026)</option>
-                <option value="yyyy-mm-dd">yyyy-mm-dd (2026-11-08)</option>
-                <option value="mm-dd-yyyy">mm-dd-yyyy (11-08-2026)</option>
-                <option value="dd/mm/yyyy">dd/mm/yyyy (08/11/2026)</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="dd-mm-yyyy">dd-mm-yyyy (08-11-2026)</SelectItem>
+                  <SelectItem value="yyyy-mm-dd">yyyy-mm-dd (2026-11-08)</SelectItem>
+                  <SelectItem value="mm-dd-yyyy">mm-dd-yyyy (11-08-2026)</SelectItem>
+                  <SelectItem value="dd/mm/yyyy">dd/mm/yyyy (08/11/2026)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 15. Timezone */}
             <div className="space-y-1.5">
-              <Label htmlFor="timezone" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("timezone")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="timezone"
+              <Select
                 value={formData.timezone}
-                onChange={(e) => handleChange("timezone", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("timezone", val);
+                }}
               >
-                <option value="Asia/Dhaka">Asia/Dhaka (GMT+6)</option>
-                <option value="Africa/Algiers">Africa/Algiers (GMT+1)</option>
-                <option value="Asia/Dubai">Asia/Dubai (GMT+4)</option>
-                <option value="Asia/Kolkata">Asia/Kolkata (GMT+5:30)</option>
-                <option value="UTC">UTC (GMT+0)</option>
-                <option value="America/New_York">America/New_York (EST)</option>
-                <option value="Europe/London">Europe/London (GMT)</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Asia/Dhaka">Asia/Dhaka (GMT+6)</SelectItem>
+                  <SelectItem value="Africa/Algiers">Africa/Algiers (GMT+1)</SelectItem>
+                  <SelectItem value="Asia/Dubai">Asia/Dubai (GMT+4)</SelectItem>
+                  <SelectItem value="Asia/Kolkata">Asia/Kolkata (GMT+5:30)</SelectItem>
+                  <SelectItem value="UTC">UTC (GMT+0)</SelectItem>
+                  <SelectItem value="America/New_York">America/New_York (EST)</SelectItem>
+                  <SelectItem value="Europe/London">Europe/London (GMT)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 16. Calender */}
             <div className="space-y-1.5">
-              <Label htmlFor="calender" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("calender")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="calender"
+              <Select
                 value={formData.calender}
-                onChange={(e) => handleChange("calender", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("calender", val);
+                }}
               >
-                <option value="Shared">{t("shared")}</option>
-                <option value="Private">{t("private")}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Shared">{t("shared")}</SelectItem>
+                  <SelectItem value="Private">{t("private")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 17. Default Warehouse */}
             <div className="space-y-1.5">
-              <Label htmlFor="defaultWarehouse" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("defaultWarehouse")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="defaultWarehouse"
+              <Select
                 value={formData.defaultWarehouse}
-                onChange={(e) => handleChange("defaultWarehouse", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("defaultWarehouse", val);
+                }}
               >
-                <option value="Uth (1)">Uth (1)</option>
-                <option value="Central Warehouse">{isBn ? "সেন্ট্রাল ওয়্যারহাউস" : "Central Warehouse"}</option>
-                <option value="Outlet 1 Stock">{isBn ? "আউটলেট ১ স্টক" : "Outlet 1 Stock"}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Uth (1)">Uth (1)</SelectItem>
+                  <SelectItem value="Central Warehouse">{isBn ? "সেন্ট্রাল ওয়্যারহাউস" : "Central Warehouse"}</SelectItem>
+                  <SelectItem value="Outlet 1 Stock">{isBn ? "আউটলেট ১ স্টক" : "Outlet 1 Stock"}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 18. Default Biller */}
@@ -442,35 +560,45 @@ export function SystemSettingsForm() {
 
             {/* 19. PDF Library */}
             <div className="space-y-1.5">
-              <Label htmlFor="pdfLibrary" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("pdfLibrary")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="pdfLibrary"
+              <Select
                 value={formData.pdfLibrary}
-                onChange={(e) => handleChange("pdfLibrary", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("pdfLibrary", val);
+                }}
               >
-                <option value="mPDF">mPDF</option>
-                <option value="DOMPDF">DOMPDF</option>
-                <option value="TCPDF">TCPDF</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mPDF">mPDF</SelectItem>
+                  <SelectItem value="DOMPDF">DOMPDF</SelectItem>
+                  <SelectItem value="TCPDF">TCPDF</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* 20. Use code for slug */}
             <div className="space-y-1.5">
-              <Label htmlFor="useCodeForSlug" className="text-xs sm:text-[13px] font-normal text-foreground">
+              <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("useCodeForSlug")} <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="useCodeForSlug"
+              <Select
                 value={formData.useCodeForSlug}
-                onChange={(e) => handleChange("useCodeForSlug", e.target.value)}
-                className={selectClassName}
+                onValueChange={(val) => {
+                  if (val) handleDropdownChange("useCodeForSlug", val);
+                }}
               >
-                <option value="Enable">{t("enable")}</option>
-                <option value="Disable">{t("disable")}</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Enable">{t("enable")}</SelectItem>
+                  <SelectItem value="Disable">{t("disable")}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
