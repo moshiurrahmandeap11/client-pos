@@ -1,0 +1,34 @@
+{
+  "auth": {
+    "terminalTitle": "অ্যাপেক্স পিওএস",
+    "terminalSubtitle": "পয়েন্ট অব সেল টার্মিনাল",
+    "loginTitle": "অপারেটর সাইন ইন",
+    "loginDescription": "টার্মিনালে প্রবেশ করতে আপনার তথ্য প্রদান করুন",
+    "emailLabel": "অপারেটর ইমেইল",
+    "emailPlaceholder": "operator@apexpos.com",
+    "passwordLabel": "পাসওয়ার্ড",
+    "passwordPlaceholder": "••••••••",
+    "submitButton": "সাইন ইন করুন",
+    "submittingButton": "যাচাই করা হচ্ছে...",
+    "sessionActive": "সক্রিয় সেশন",
+    "sessionDescription": "টার্মিনাল অনুমোদিত এবং প্রস্তুত",
+    "operatorName": "অপারেটর",
+    "operatorEmail": "ইমেইল",
+    "operatorRole": "পদবি",
+    "terminalStatus": "স্ট্যাটাস",
+    "statusOnline": "অনলাইন",
+    "statusInactive": "নিষ্ক্রিয়",
+    "logoutButton": "সাইন আউট করুন",
+    "quickFillTitle": "পরীক্ষামূলক অ্যাকাউন্ট",
+    "supervisor": "সুপারভাইজার",
+    "cashier": "ক্যাশিয়ার",
+    "togglePassword": "পাসওয়ার্ড দেখুন বা লুকান"
+  },
+  "nav": {
+    "language": "ভাষা",
+    "theme": "থিম পরিবর্তন",
+    "light": "লাইট",
+    "dark": "ডার্ক",
+    "system": "সিস্টেম"
+  }
+}

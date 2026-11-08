@@ -1,0 +1,34 @@
+{
+  "auth": {
+    "terminalTitle": "APEX POS",
+    "terminalSubtitle": "Point of Sale Terminal",
+    "loginTitle": "Operator Sign In",
+    "loginDescription": "Enter your credentials to access the terminal",
+    "emailLabel": "Operator Email",
+    "emailPlaceholder": "operator@apexpos.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••••",
+    "submitButton": "Sign In",
+    "submittingButton": "Authenticating...",
+    "sessionActive": "Active Session",
+    "sessionDescription": "Terminal authenticated and operational",
+    "operatorName": "Operator",
+    "operatorEmail": "Email",
+    "operatorRole": "Role",
+    "terminalStatus": "Status",
+    "statusOnline": "Online",
+    "statusInactive": "Inactive",
+    "logoutButton": "Sign Out",
+    "quickFillTitle": "Test Accounts",
+    "supervisor": "Supervisor",
+    "cashier": "Cashier",
+    "togglePassword": "Show or hide password"
+  },
+  "nav": {
+    "language": "Language",
+    "theme": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}
