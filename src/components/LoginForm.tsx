@@ -27,7 +27,6 @@ import {
   UserCheck,
   Eye,
   EyeOff,
-  Terminal,
 } from "lucide-react";
 
 export function LoginForm() {
@@ -51,24 +50,17 @@ export function LoginForm() {
       const res = await login({ email: email.trim(), password });
       setSuccessMsg(res.user.name);
     } catch {
-      // Error is handled in useAuth hook
+      // Handled in useAuth hook
     }
-  };
-
-  const handleQuickFill = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setSuccessMsg(null);
   };
 
   return (
     <div className="w-full max-w-md mx-auto space-y-4">
-      {/* Top Utility Controls: Theme & Language */}
+      {/* Top Utility Controls: Title without icon, Language & Theme Toggle */}
       <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium tracking-wide">
-          <Terminal className="h-3.5 w-3.5" />
-          <span>{t("terminalTitle")}</span>
-        </div>
+        <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+          {t("terminalTitle")}
+        </span>
         <div className="flex items-center gap-1.5">
           <LanguageSwitcher />
           <ThemeToggle />
@@ -203,31 +195,6 @@ export function LoginForm() {
                     aria-label={t("togglePassword")}
                   >
                     {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Test Credentials Helper */}
-              <div className="rounded-md border border-border/60 bg-muted/20 p-2 space-y-1.5">
-                <div className="text-[11px] text-muted-foreground font-medium">
-                  {t("quickFillTitle")}
-                </div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill("supervisor@apexpos.com", "password123")}
-                    className="rounded border border-border bg-background px-2 py-1 text-left hover:bg-accent transition cursor-pointer"
-                  >
-                    <div className="text-xs font-medium text-foreground">{t("supervisor")}</div>
-                    <div className="text-[10px] text-muted-foreground font-mono truncate">supervisor@apexpos.com</div>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickFill("cashier@apexpos.com", "password123")}
-                    className="rounded border border-border bg-background px-2 py-1 text-left hover:bg-accent transition cursor-pointer"
-                  >
-                    <div className="text-xs font-medium text-foreground">{t("cashier")}</div>
-                    <div className="text-[10px] text-muted-foreground font-mono truncate">cashier@apexpos.com</div>
                   </button>
                 </div>
               </div>

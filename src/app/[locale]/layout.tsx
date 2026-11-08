@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Hind_Siliguri } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -11,6 +11,13 @@ const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-poppins",
+  display: "swap",
+});
+
+const hindSiliguri = Hind_Siliguri({
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["bengali", "latin"],
+  variable: "--font-bengali",
   display: "swap",
 });
 
@@ -39,8 +46,16 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={poppins.variable} suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+    <html
+      lang={locale}
+      className={`${poppins.variable} ${hindSiliguri.variable}`}
+      suppressHydrationWarning
+    >
+      <body
+        className={`min-h-screen bg-background text-foreground antialiased ${
+          locale === "bn" ? "font-bengali" : "font-sans"
+        }`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

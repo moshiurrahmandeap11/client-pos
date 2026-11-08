@@ -19,9 +19,6 @@
     "statusOnline": "Online",
     "statusInactive": "Inactive",
     "logoutButton": "Sign Out",
-    "quickFillTitle": "Test Accounts",
-    "supervisor": "Supervisor",
-    "cashier": "Cashier",
     "togglePassword": "Show or hide password"
   },
   "nav": {
