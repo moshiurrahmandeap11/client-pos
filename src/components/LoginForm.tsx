@@ -8,8 +8,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,13 +66,13 @@ export function LoginForm() {
       </div>
 
       {isLoading ? (
-        <Card className="border-border shadow-sm min-h-[320px] flex items-center justify-center">
+        <Card className="border-border shadow-sm min-h-[340px] flex items-center justify-center p-6">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </Card>
       ) : user ? (
         /* Authenticated Active Terminal View */
-        <Card className="border-border shadow-sm">
-          <CardHeader className="pb-3 text-center">
+        <Card className="border-border shadow-sm p-6 sm:p-7 space-y-5">
+          <CardHeader className="p-0 text-center space-y-1.5">
             <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <UserCheck className="h-5 w-5" />
             </div>
@@ -85,48 +83,46 @@ export function LoginForm() {
               {t("sessionDescription")}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3 pt-1">
-            <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 text-xs">
-              <div className="flex justify-between items-center py-0.5 border-b border-border/50">
-                <span className="text-muted-foreground">{t("operatorName")}</span>
-                <span className="font-normal text-foreground">{user.name}</span>
-              </div>
-              <div className="flex justify-between items-center py-0.5 border-b border-border/50">
-                <span className="text-muted-foreground">{t("operatorEmail")}</span>
-                <span className="font-mono text-foreground font-normal">{user.email}</span>
-              </div>
-              <div className="flex justify-between items-center py-0.5 border-b border-border/50">
-                <span className="text-muted-foreground">{t("operatorRole")}</span>
-                <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 font-normal text-primary">
-                  <ShieldCheck className="h-3 w-3" />
-                  {user.role}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-0.5">
-                <span className="text-muted-foreground">{t("terminalStatus")}</span>
-                <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-normal">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  {t("statusOnline")}
-                </span>
-              </div>
+
+          <div className="rounded-md border border-border bg-muted/30 p-3.5 space-y-2 text-xs">
+            <div className="flex justify-between items-center py-1 border-b border-border/50">
+              <span className="text-muted-foreground">{t("operatorName")}</span>
+              <span className="font-normal text-foreground">{user.name}</span>
             </div>
-          </CardContent>
-          <CardFooter className="pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full gap-2 text-destructive hover:text-destructive cursor-pointer h-9 font-normal"
-              onClick={logout}
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              {t("logoutButton")}
-            </Button>
-          </CardFooter>
+            <div className="flex justify-between items-center py-1 border-b border-border/50">
+              <span className="text-muted-foreground">{t("operatorEmail")}</span>
+              <span className="font-mono text-foreground font-normal">{user.email}</span>
+            </div>
+            <div className="flex justify-between items-center py-1 border-b border-border/50">
+              <span className="text-muted-foreground">{t("operatorRole")}</span>
+              <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 font-normal text-primary">
+                <ShieldCheck className="h-3 w-3" />
+                {user.role}
+              </span>
+            </div>
+            <div className="flex justify-between items-center py-1">
+              <span className="text-muted-foreground">{t("terminalStatus")}</span>
+              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-normal">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                {t("statusOnline")}
+              </span>
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            size="default"
+            className="w-full gap-2 text-destructive hover:text-destructive cursor-pointer h-10 font-normal text-xs"
+            onClick={logout}
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            {t("logoutButton")}
+          </Button>
         </Card>
       ) : (
         /* Unauthenticated Clean Sign In Form */
-        <Card className="border-border shadow-sm">
-          <CardHeader className="space-y-1 pb-4 text-center">
+        <Card className="border-border shadow-sm p-6 sm:p-7">
+          <CardHeader className="p-0 pb-6 text-center space-y-1.5">
             <CardTitle className="text-xl font-normal tracking-normal min-h-[28px] flex items-center justify-center">
               {t("loginTitle")}
             </CardTitle>
@@ -135,84 +131,83 @@ export function LoginForm() {
             </CardDescription>
           </CardHeader>
 
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-3.5">
-              {/* Error Message */}
-              {error && (
-                <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive font-normal">
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* Success Message */}
-              {successMsg && (
-                <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-2.5 text-xs text-emerald-600 dark:text-emerald-400 font-normal">
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                  <span>{successMsg}</span>
-                </div>
-              )}
-
-              {/* Operator Email Field */}
-              <div className="space-y-1">
-                <Label
-                  htmlFor="email"
-                  className="text-xs text-muted-foreground font-normal block h-4 leading-none"
-                >
-                  {t("emailLabel")}
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder={t("emailPlaceholder")}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="pl-8 text-xs h-9 font-normal"
-                    autoComplete="email"
-                  />
-                </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive font-normal">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                <span>{error}</span>
               </div>
+            )}
 
-              {/* Security Password Field */}
-              <div className="space-y-1">
-                <Label
-                  htmlFor="password"
-                  className="text-xs text-muted-foreground font-normal block h-4 leading-none"
-                >
-                  {t("passwordLabel")}
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder={t("passwordPlaceholder")}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="pl-8 pr-8 text-xs h-9 font-normal"
-                    autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground cursor-pointer"
-                    aria-label={t("togglePassword")}
-                  >
-                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                  </button>
-                </div>
+            {/* Success Message */}
+            {successMsg && (
+              <div className="flex items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-2.5 text-xs text-emerald-600 dark:text-emerald-400 font-normal">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                <span>{successMsg}</span>
               </div>
-            </CardContent>
+            )}
 
-            <CardFooter className="pt-2 pb-4">
+            {/* Operator Email Field */}
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="email"
+                className="text-xs text-muted-foreground font-normal block h-4 leading-none"
+              >
+                {t("emailLabel")}
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder={t("emailPlaceholder")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="pl-9 text-xs h-9 font-normal"
+                  autoComplete="email"
+                />
+              </div>
+            </div>
+
+            {/* Security Password Field */}
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="password"
+                className="text-xs text-muted-foreground font-normal block h-4 leading-none"
+              >
+                {t("passwordLabel")}
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={t("passwordPlaceholder")}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="pl-9 pr-9 text-xs h-9 font-normal"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground cursor-pointer"
+                  aria-label={t("togglePassword")}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button with proper spacing */}
+            <div className="pt-2">
               <Button
                 type="submit"
                 size="default"
-                className="w-full gap-2 cursor-pointer font-normal h-9"
+                className="w-full gap-2 cursor-pointer font-normal h-9.5 text-xs"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -224,7 +219,7 @@ export function LoginForm() {
                   <span>{t("submitButton")}</span>
                 )}
               </Button>
-            </CardFooter>
+            </div>
           </form>
         </Card>
       )}
