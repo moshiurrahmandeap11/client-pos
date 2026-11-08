@@ -10,7 +10,6 @@ import {
   PanelLeftClose,
   X,
   ChevronDown,
-  ChevronRight,
   Sliders,
   MonitorCheck,
   FolderTree,
@@ -120,7 +119,7 @@ export function Sidebar({
           fixed md:sticky top-0 left-0 z-50 md:z-30 h-screen
           bg-sidebar text-sidebar-foreground border-r border-sidebar-border
           flex flex-col select-none
-          transition-all duration-300 ease-in-out
+          transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)]
           ${
             /* Mobile drawer slide behavior */
             isMobileOpen
@@ -269,55 +268,68 @@ export function Sidebar({
                 )}
               </div>
 
-              {/* Accordion Chevron Indicator */}
+              {/* Accordion Chevron: Smooth Liquid Rotation */}
               {(isExpanded || isMobileOpen) && (
-                <div className="text-sidebar-foreground/60 transition-transform duration-200">
-                  {isSettingsOpen ? (
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  ) : (
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  )}
+                <div
+                  className={`text-sidebar-foreground/60 transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                    isSettingsOpen ? "rotate-0" : "-rotate-90"
+                  }`}
+                >
+                  <ChevronDown className="h-3.5 w-3.5" />
                 </div>
               )}
             </div>
 
-            {/* Submenu List (Only visible when expanded and open) */}
-            {(isExpanded || isMobileOpen) && isSettingsOpen && (
-              <div className="ml-4 pl-2 border-l border-sidebar-border/70 space-y-0.5 animate-in fade-in duration-200">
-                {settingsSubmenu.map((sub) => {
-                  const SubIcon = sub.icon;
-                  const isSubActive =
-                    pathname === sub.href ||
-                    activeSubItem === sub.id ||
-                    (pathname === "/settings" && sub.id === "system-settings");
+            {/* Liquid Accordion Submenu Container (CSS Grid 0fr <-> 1fr) */}
+            <div
+              className={`grid overflow-hidden transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                (isExpanded || isMobileOpen) && isSettingsOpen
+                  ? "grid-rows-[1fr] opacity-100 mt-1"
+                  : "grid-rows-[0fr] opacity-0 pointer-events-none mt-0"
+              }`}
+            >
+              <div className="min-h-0 overflow-hidden">
+                <div className="ml-4 pl-2 border-l border-sidebar-border/70 space-y-0.5 pt-0.5 pb-1">
+                  {settingsSubmenu.map((sub, index) => {
+                    const SubIcon = sub.icon;
+                    const isSubActive =
+                      pathname === sub.href ||
+                      activeSubItem === sub.id ||
+                      (pathname === "/settings" && sub.id === "system-settings");
 
-                  return (
-                    <Link
-                      key={sub.id}
-                      href={sub.href}
-                      onClick={() => {
-                        if (onSelectItem) onSelectItem(sub.id);
-                        if (isMobileOpen) onCloseMobile();
-                      }}
-                      className={`
-                        w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[11px] font-normal
-                        transition-colors cursor-pointer outline-none select-none
-                        ${
-                          isSubActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-normal"
-                            : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/40"
-                        }
-                      `}
-                    >
-                      <SubIcon className="h-3.5 w-3.5 shrink-0 opacity-80" />
-                      <span className="truncate whitespace-nowrap">
-                        {tSettings(sub.key as any)}
-                      </span>
-                    </Link>
-                  );
-                })}
+                    return (
+                      <Link
+                        key={sub.id}
+                        href={sub.href}
+                        onClick={() => {
+                          if (onSelectItem) onSelectItem(sub.id);
+                          if (isMobileOpen) onCloseMobile();
+                        }}
+                        style={{
+                          transitionDelay: isSettingsOpen
+                            ? `${Math.min(index * 12, 180)}ms`
+                            : "0ms",
+                        }}
+                        className={`
+                          w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-[11px] font-normal
+                          transition-all duration-200 cursor-pointer outline-none select-none
+                          ${
+                            isSubActive
+                              ? "bg-sidebar-accent text-sidebar-accent-foreground font-normal translate-x-0.5"
+                              : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 hover:translate-x-0.5"
+                          }
+                        `}
+                      >
+                        <SubIcon className="h-3.5 w-3.5 shrink-0 opacity-80" />
+                        <span className="truncate whitespace-nowrap">
+                          {tSettings(sub.key as any)}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
