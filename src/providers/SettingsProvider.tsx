@@ -7,12 +7,14 @@ import React, {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
 } from "react";
 import { useTheme } from "next-themes";
 import {
   settingsService,
   SystemSettingsData,
 } from "@/services/settings.service";
+import { transitionThemeWithRipple } from "@/lib/themeTransition";
 
 // Known currency code to symbol map
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -63,6 +65,7 @@ export interface SettingsContextType {
   formatDate: (date?: Date | string | null) => string;
   refreshSettings: () => Promise<void>;
   updateSettings: (payload: Partial<SystemSettingsData>) => Promise<SystemSettingsData>;
+  changeThemeWithAnimation: (theme: string, origin?: { x: number; y: number }) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -70,7 +73,8 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<SystemSettingsData>(DEFAULT_SYSTEM_SETTINGS);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { setTheme } = useTheme();
+  const { setTheme, theme: currentActiveTheme } = useTheme();
+  const isFirstRender = useRef(true);
 
   // Fetch settings from API
   const fetchSettings = useCallback(async () => {
@@ -90,14 +94,28 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     fetchSettings();
   }, [fetchSettings]);
 
+  // Animated Theme Changer
+  const changeThemeWithAnimation = useCallback(
+    (newTheme: string, origin?: { x: number; y: number }) => {
+      transitionThemeWithRipple(newTheme, setTheme, origin);
+    },
+    [setTheme]
+  );
+
   // Update Settings mutation
   const updateSettings = useCallback(
     async (payload: Partial<SystemSettingsData>): Promise<SystemSettingsData> => {
       const updated = await settingsService.updateSystemSettings(payload);
       setSettings(updated);
+
+      // If theme changed in payload, trigger ripple transition
+      if (payload.theme) {
+        transitionThemeWithRipple(payload.theme, setTheme);
+      }
+
       return updated;
     },
-    []
+    [setTheme]
   );
 
   // Global Side-Effects:
@@ -117,18 +135,21 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [settings.rtlSupport]);
 
-  // 3. Theme synchronization (Light / Dark / Default)
+  // 3. Theme synchronization on load / update (with ripple after initial mount)
   useEffect(() => {
     if (!settings.theme) return;
-    const themeVal = settings.theme.toLowerCase();
-    if (themeVal === "dark") {
-      setTheme("dark");
-    } else if (themeVal === "light") {
-      setTheme("light");
-    } else if (themeVal === "system" || themeVal === "default") {
-      setTheme("system");
+    const targetTheme = settings.theme.toLowerCase();
+    const mapped = targetTheme === "default" ? "system" : targetTheme;
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      setTheme(mapped);
+    } else {
+      if (currentActiveTheme !== mapped) {
+        transitionThemeWithRipple(mapped, setTheme);
+      }
     }
-  }, [settings.theme, setTheme]);
+  }, [settings.theme, currentActiveTheme, setTheme]);
 
   // Computed currency symbol
   const currencySymbol = useMemo(() => {
@@ -185,8 +206,18 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       formatDate,
       refreshSettings: fetchSettings,
       updateSettings,
+      changeThemeWithAnimation,
     }),
-    [settings, isLoading, currencySymbol, formatCurrency, formatDate, fetchSettings, updateSettings]
+    [
+      settings,
+      isLoading,
+      currencySymbol,
+      formatCurrency,
+      formatDate,
+      fetchSettings,
+      updateSettings,
+      changeThemeWithAnimation,
+    ]
   );
 
   return (

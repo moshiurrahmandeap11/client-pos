@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
+import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { SettingsProvider } from "@/providers/SettingsProvider";
@@ -67,6 +68,33 @@ export default function RootLayout({
         >
           <SettingsProvider>
             <AuthProvider>{children}</AuthProvider>
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3500,
+                style: {
+                  background: "var(--color-card, #ffffff)",
+                  color: "var(--color-foreground, #0f172a)",
+                  border: "1px solid var(--color-border, #e2e8f0)",
+                  fontSize: "12px",
+                  fontWeight: 400,
+                  borderRadius: "0.75rem",
+                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                },
+                success: {
+                  iconTheme: {
+                    primary: "#10b981",
+                    secondary: "#ffffff",
+                  },
+                },
+                error: {
+                  iconTheme: {
+                    primary: "#ef4444",
+                    secondary: "#ffffff",
+                  },
+                },
+              }}
+            />
           </SettingsProvider>
         </ThemeProvider>
       </body>

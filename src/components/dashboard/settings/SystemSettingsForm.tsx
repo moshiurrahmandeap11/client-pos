@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { usePathname, useRouter } from "@/i18n/routing";
+import toast from "react-hot-toast";
 import { useSettings } from "@/hooks/useSettings";
 import { SystemSettingsData } from "@/services/settings.service";
 import { Card } from "@/components/ui/card";
@@ -12,18 +14,22 @@ import {
   Sliders,
   Save,
   Loader2,
-  CheckCircle2,
-  AlertCircle,
-  RefreshCw,
 } from "lucide-react";
 
 export function SystemSettingsForm() {
   const t = useTranslations("settingsMenu");
-  const { settings, updateSettings, isLoading: isContextLoading } = useSettings();
+  const currentLocale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const {
+    settings,
+    updateSettings,
+    changeThemeWithAnimation,
+    isLoading: isContextLoading,
+  } = useSettings();
 
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Form State initialized from global context settings
   const [formData, setFormData] = useState<SystemSettingsData>(settings);
@@ -43,26 +49,44 @@ export function SystemSettingsForm() {
       ...prev,
       [field]: value,
     }));
-    setSuccessMessage(null);
-    setErrorMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    setSuccessMessage(null);
-    setErrorMessage(null);
 
     try {
-      const updated = await updateSettings({
+      const payload: Partial<SystemSettingsData> = {
         ...formData,
         numberDaysDisableEditing: Number(formData.numberDaysDisableEditing) || 0,
         rowsPerPage: Number(formData.rowsPerPage) || 10,
-      });
+      };
+
+      const updated = await updateSettings(payload);
       setFormData(updated);
-      setSuccessMessage("System settings updated successfully.");
+
+      toast.success(
+        currentLocale === "bn"
+          ? "সিস্টেম সেটিংস সফলভাবে সংরক্ষিত হয়েছে।"
+          : "System settings updated successfully."
+      );
+
+      // Dynamically apply selected Language locale across the site
+      const targetLocale =
+        formData.language?.toLowerCase().includes("bengali") ||
+        formData.language?.toLowerCase().includes("bangla")
+          ? "bn"
+          : "en";
+
+      if (targetLocale !== currentLocale) {
+        if (typeof document !== "undefined") {
+          document.documentElement.lang = targetLocale;
+          document.documentElement.setAttribute("data-locale", targetLocale);
+        }
+        router.replace(pathname, { locale: targetLocale });
+      }
     } catch (err: any) {
-      setErrorMessage(err.message || "Failed to update settings. Please try again.");
+      toast.error(err.message || "Failed to update settings. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -101,16 +125,6 @@ export function SystemSettingsForm() {
           </div>
         </div>
       </div>
-
-      {/* Notifications */}
-      {successMessage && (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 text-xs text-emerald-600 dark:text-emerald-400 font-normal animate-in fade-in">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
-          <span>{successMessage}</span>
-        </div>
-      )}
-
-      {errorSourceMessage(errorMessage)}
 
       {/* Settings Form Grid - Full Width & Fully Responsive */}
       <form onSubmit={handleSubmit} className="w-full space-y-6">
@@ -253,7 +267,7 @@ export function SystemSettingsForm() {
               </select>
             </div>
 
-            {/* 9. Theme */}
+            {/* 9. Theme with Liquid Ripple Animation */}
             <div className="space-y-1.5">
               <Label htmlFor="theme" className="text-xs font-normal text-foreground">
                 Theme <span className="text-destructive">*</span>
@@ -261,7 +275,15 @@ export function SystemSettingsForm() {
               <select
                 id="theme"
                 value={formData.theme}
-                onChange={(e) => handleChange("theme", e.target.value)}
+                onChange={(e) => {
+                  const newTheme = e.target.value;
+                  handleChange("theme", newTheme);
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  changeThemeWithAnimation(newTheme, {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2,
+                  });
+                }}
                 className={selectClassName}
               >
                 <option value="Default">Default</option>
@@ -485,16 +507,6 @@ export function SystemSettingsForm() {
           </div>
         </Card>
       </form>
-    </div>
-  );
-}
-
-function errorSourceMessage(msg: string | null) {
-  if (!msg) return null;
-  return (
-    <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs text-destructive font-normal animate-in fade-in">
-      <AlertCircle className="h-4 w-4 shrink-0" />
-      <span>{msg}</span>
     </div>
   );
 }
