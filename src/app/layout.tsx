@@ -33,7 +33,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${poppins.variable} ${hindSiliguri.variable}`}
     >
-      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground">
+      <body
+        suppressHydrationWarning
+        className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground"
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
