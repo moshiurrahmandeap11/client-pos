@@ -55,6 +55,20 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettingsData = {
   defaultBiller: "Apex POS",
   pdfLibrary: "mPDF",
   useCodeForSlug: "Enable",
+  productTax: "Enable",
+  racks: "Disable",
+  productVariants: "Enable",
+  productExpiry: "Disable",
+  removeExpired: "No, I will remove manually",
+  imageWidth: 800,
+  imageHeight: 800,
+  thumbnailWidth: 150,
+  thumbnailHeight: 150,
+  watermark: "Yes",
+  displayWarehouseProducts: "Hide with 0 quantity",
+  barcodeSeparator: "Dot (.)",
+  barcodeRenderer: "Image",
+  updateCostWithPurchase: "No",
 };
 
 export interface SettingsContextType {

@@ -47,7 +47,7 @@ export function SystemSettingsForm() {
     }
   }, [settings]);
 
-  // Handle standard text input changes
+  // Handle standard text / number input changes
   const handleChange = (
     field: keyof SystemSettingsData,
     value: string | number
@@ -81,6 +81,10 @@ export function SystemSettingsForm() {
         ...updatedForm,
         numberDaysDisableEditing: Number(updatedForm.numberDaysDisableEditing) || 0,
         rowsPerPage: Number(updatedForm.rowsPerPage) || 10,
+        imageWidth: Number(updatedForm.imageWidth) || 800,
+        imageHeight: Number(updatedForm.imageHeight) || 800,
+        thumbnailWidth: Number(updatedForm.thumbnailWidth) || 150,
+        thumbnailHeight: Number(updatedForm.thumbnailHeight) || 150,
       };
 
       await updateSettings(payload);
@@ -107,7 +111,7 @@ export function SystemSettingsForm() {
     }
   };
 
-  // Full form submission (for text fields like Site Name, Email, Biller, Days)
+  // Full form submission (for text and numeric fields like Site Name, Email, Biller, Days, Image Sizes)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -117,6 +121,10 @@ export function SystemSettingsForm() {
         ...formData,
         numberDaysDisableEditing: Number(formData.numberDaysDisableEditing) || 0,
         rowsPerPage: Number(formData.rowsPerPage) || 10,
+        imageWidth: Number(formData.imageWidth) || 800,
+        imageHeight: Number(formData.imageHeight) || 800,
+        thumbnailWidth: Number(formData.thumbnailWidth) || 150,
+        thumbnailHeight: Number(formData.thumbnailHeight) || 150,
       };
 
       const updated = await updateSettings(payload);
@@ -172,7 +180,8 @@ export function SystemSettingsForm() {
 
       {/* Settings Form Grid - Full Width & Fully Responsive */}
       <form onSubmit={handleSubmit} className="w-full space-y-6">
-        <Card className="border-border bg-card p-5 sm:p-6 space-y-6 shadow-xs w-full">
+        <Card className="border-border bg-card p-5 sm:p-6 space-y-8 shadow-xs w-full">
+          {/* Section 1: Main Site Configuration (20 fields) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
             {/* 1. Site Name */}
             <div className="space-y-1.5">
@@ -181,7 +190,7 @@ export function SystemSettingsForm() {
               </Label>
               <Input
                 id="siteName"
-                value={formData.siteName}
+                value={formData.siteName || ""}
                 onChange={(e) => handleChange("siteName", e.target.value)}
                 placeholder={t("siteNamePlaceholder")}
                 required
@@ -195,7 +204,7 @@ export function SystemSettingsForm() {
                 {t("language")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.language}
+                value={formData.language || "English"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("language", val);
                 }}
@@ -218,7 +227,7 @@ export function SystemSettingsForm() {
                 {t("defaultCurrency")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.defaultCurrency}
+                value={formData.defaultCurrency || "BDT"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("defaultCurrency", val);
                 }}
@@ -244,7 +253,7 @@ export function SystemSettingsForm() {
                 {t("accountingMethod")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.accountingMethod}
+                value={formData.accountingMethod || "AVCO (Average Cost Method)"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("accountingMethod", val);
                 }}
@@ -257,10 +266,10 @@ export function SystemSettingsForm() {
                     {isBn ? "এভকো (AVCO - গড় খরচ পদ্ধতি)" : "AVCO (Average Cost Method)"}
                   </SelectItem>
                   <SelectItem value="FIFO (First In First Out)">
-                    {isBn ? "ফিফো (FIFO - আগে আসা পণ্য আগে বিক্রি)" : "FIFO (First In First Out)"}
+                    {isBn ? "ফিফো (FIFO - আগে আসলে আগে ব্যয়)" : "FIFO (First In First Out)"}
                   </SelectItem>
                   <SelectItem value="LIFO (Last In First Out)">
-                    {isBn ? "লিফো (LIFO - পরে আসা পণ্য আগে বিক্রি)" : "LIFO (Last In First Out)"}
+                    {isBn ? "লিফো (LIFO - পরে আসলে আগে ব্যয়)" : "LIFO (Last In First Out)"}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -274,7 +283,7 @@ export function SystemSettingsForm() {
               <Input
                 id="defaultEmail"
                 type="email"
-                value={formData.defaultEmail}
+                value={formData.defaultEmail || ""}
                 onChange={(e) => handleChange("defaultEmail", e.target.value)}
                 placeholder={t("defaultEmailPlaceholder")}
                 required
@@ -288,7 +297,7 @@ export function SystemSettingsForm() {
                 {t("defaultCustomerGroup")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.defaultCustomerGroup}
+                value={formData.defaultCustomerGroup || "General"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("defaultCustomerGroup", val);
                 }}
@@ -297,10 +306,10 @@ export function SystemSettingsForm() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="General">{isBn ? "সাধারণ (General)" : "General"}</SelectItem>
-                  <SelectItem value="Retail">{isBn ? "খুচরা (Retail)" : "Retail"}</SelectItem>
-                  <SelectItem value="Wholesale">{isBn ? "পাইকারি (Wholesale)" : "Wholesale"}</SelectItem>
+                  <SelectItem value="General">{isBn ? "সাধারণ গ্রাহক (General)" : "General"}</SelectItem>
                   <SelectItem value="VIP">{isBn ? "ভিআইপি (VIP)" : "VIP"}</SelectItem>
+                  <SelectItem value="Wholesale">{isBn ? "পাইকারি (Wholesale)" : "Wholesale"}</SelectItem>
+                  <SelectItem value="Distributor">{isBn ? "পরিবেশক (Distributor)" : "Distributor"}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -311,7 +320,7 @@ export function SystemSettingsForm() {
                 {t("defaultPriceGroup")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.defaultPriceGroup}
+                value={formData.defaultPriceGroup || "Default"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("defaultPriceGroup", val);
                 }}
@@ -321,8 +330,9 @@ export function SystemSettingsForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Default">{isBn ? "ডিফল্ট (Default)" : "Default"}</SelectItem>
-                  <SelectItem value="Retail Tier 1">{isBn ? "খুচরা টায়ার ১ (Retail Tier 1)" : "Retail Tier 1"}</SelectItem>
-                  <SelectItem value="Wholesale Tier 2">{isBn ? "পাইকারি টায়ার ২ (Wholesale Tier 2)" : "Wholesale Tier 2"}</SelectItem>
+                  <SelectItem value="Retail Price">{isBn ? "খুচরা মূল্য (Retail Price)" : "Retail Price"}</SelectItem>
+                  <SelectItem value="Wholesale Price">{isBn ? "পাইকারি মূল্য (Wholesale Price)" : "Wholesale Price"}</SelectItem>
+                  <SelectItem value="Corporate Discount">{isBn ? "কর্পোরেট মূল্য (Corporate Discount)" : "Corporate Discount"}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -333,7 +343,7 @@ export function SystemSettingsForm() {
                 {t("maintenanceMode")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.maintenanceMode}
+                value={formData.maintenanceMode || "No"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("maintenanceMode", val);
                 }}
@@ -348,13 +358,13 @@ export function SystemSettingsForm() {
               </Select>
             </div>
 
-            {/* 9. Theme with Liquid Ripple Animation */}
+            {/* 9. Theme */}
             <div className="space-y-1.5">
               <Label className="text-xs sm:text-[13px] font-normal text-foreground">
                 {t("theme")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.theme}
+                value={formData.theme || "Default"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("theme", val);
                 }}
@@ -376,7 +386,7 @@ export function SystemSettingsForm() {
                 {t("rtlSupport")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.rtlSupport}
+                value={formData.rtlSupport || "Disable"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("rtlSupport", val);
                 }}
@@ -397,7 +407,7 @@ export function SystemSettingsForm() {
                 {t("loginCaptcha")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.loginCaptcha}
+                value={formData.loginCaptcha || "Disable"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("loginCaptcha", val);
                 }}
@@ -420,9 +430,11 @@ export function SystemSettingsForm() {
               <Input
                 id="numberDaysDisableEditing"
                 type="number"
-                min="0"
-                value={formData.numberDaysDisableEditing}
-                onChange={(e) => handleChange("numberDaysDisableEditing", e.target.value)}
+                min={0}
+                value={formData.numberDaysDisableEditing ?? 0}
+                onChange={(e) =>
+                  handleChange("numberDaysDisableEditing", Number(e.target.value))
+                }
                 required
                 className="text-xs sm:text-[13px] h-9.5 font-normal"
               />
@@ -434,7 +446,7 @@ export function SystemSettingsForm() {
                 {t("rowsPerPage")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={String(formData.rowsPerPage)}
+                value={String(formData.rowsPerPage || 10)}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("rowsPerPage", val);
                 }}
@@ -457,7 +469,7 @@ export function SystemSettingsForm() {
                 {t("dateFormat")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.dateFormat}
+                value={formData.dateFormat || "dd-mm-yyyy"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("dateFormat", val);
                 }}
@@ -466,10 +478,11 @@ export function SystemSettingsForm() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dd-mm-yyyy">dd-mm-yyyy (08-11-2026)</SelectItem>
-                  <SelectItem value="yyyy-mm-dd">yyyy-mm-dd (2026-11-08)</SelectItem>
-                  <SelectItem value="mm-dd-yyyy">mm-dd-yyyy (11-08-2026)</SelectItem>
-                  <SelectItem value="dd/mm/yyyy">dd/mm/yyyy (08/11/2026)</SelectItem>
+                  <SelectItem value="dd-mm-yyyy">dd-mm-yyyy (e.g. 08-11-2026)</SelectItem>
+                  <SelectItem value="yyyy-mm-dd">yyyy-mm-dd (e.g. 2026-11-08)</SelectItem>
+                  <SelectItem value="mm/dd/yyyy">mm/dd/yyyy (e.g. 11/08/2026)</SelectItem>
+                  <SelectItem value="dd/mm/yyyy">dd/mm/yyyy (e.g. 08/11/2026)</SelectItem>
+                  <SelectItem value="dd.mm.yyyy">dd.mm.yyyy (e.g. 08.11.2026)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -480,7 +493,7 @@ export function SystemSettingsForm() {
                 {t("timezone")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.timezone}
+                value={formData.timezone || "Asia/Dhaka"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("timezone", val);
                 }}
@@ -490,12 +503,12 @@ export function SystemSettingsForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Asia/Dhaka">Asia/Dhaka (GMT+6)</SelectItem>
-                  <SelectItem value="Africa/Algiers">Africa/Algiers (GMT+1)</SelectItem>
-                  <SelectItem value="Asia/Dubai">Asia/Dubai (GMT+4)</SelectItem>
                   <SelectItem value="Asia/Kolkata">Asia/Kolkata (GMT+5:30)</SelectItem>
-                  <SelectItem value="UTC">UTC (GMT+0)</SelectItem>
-                  <SelectItem value="America/New_York">America/New_York (EST)</SelectItem>
-                  <SelectItem value="Europe/London">Europe/London (GMT)</SelectItem>
+                  <SelectItem value="Asia/Dubai">Asia/Dubai (GMT+4)</SelectItem>
+                  <SelectItem value="Asia/Riyadh">Asia/Riyadh (GMT+3)</SelectItem>
+                  <SelectItem value="Europe/London">Europe/London (GMT+0)</SelectItem>
+                  <SelectItem value="America/New_York">America/New_York (GMT-5)</SelectItem>
+                  <SelectItem value="Africa/Algiers">Africa/Algiers (GMT+1)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -506,7 +519,7 @@ export function SystemSettingsForm() {
                 {t("calender")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.calender}
+                value={formData.calender || "Shared"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("calender", val);
                 }}
@@ -527,7 +540,7 @@ export function SystemSettingsForm() {
                 {t("defaultWarehouse")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.defaultWarehouse}
+                value={formData.defaultWarehouse || "Uth (1)"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("defaultWarehouse", val);
                 }}
@@ -550,7 +563,7 @@ export function SystemSettingsForm() {
               </Label>
               <Input
                 id="defaultBiller"
-                value={formData.defaultBiller}
+                value={formData.defaultBiller || ""}
                 onChange={(e) => handleChange("defaultBiller", e.target.value)}
                 placeholder={t("defaultBillerPlaceholder")}
                 required
@@ -564,7 +577,7 @@ export function SystemSettingsForm() {
                 {t("pdfLibrary")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.pdfLibrary}
+                value={formData.pdfLibrary || "mPDF"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("pdfLibrary", val);
                 }}
@@ -586,7 +599,7 @@ export function SystemSettingsForm() {
                 {t("useCodeForSlug")} <span className="text-destructive">*</span>
               </Label>
               <Select
-                value={formData.useCodeForSlug}
+                value={formData.useCodeForSlug || "Enable"}
                 onValueChange={(val) => {
                   if (val) handleDropdownChange("useCodeForSlug", val);
                 }}
@@ -599,6 +612,302 @@ export function SystemSettingsForm() {
                   <SelectItem value="Disable">{t("disable")}</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          {/* Section 2: Products Configuration Sub-section */}
+          <div className="w-full pt-2">
+            {/* Subsection Tab Header */}
+            <div className="flex items-center">
+              <div className="px-4 py-1.5 text-xs sm:text-[13px] font-medium text-primary border border-border border-b-background bg-card rounded-t-md shadow-2xs z-10">
+                {t("productsSection")}
+              </div>
+            </div>
+
+            {/* Products Fields Box */}
+            <div className="border border-border rounded-b-md rounded-tr-md p-5 sm:p-6 bg-muted/15 dark:bg-muted/10 -mt-[1px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                {/* 1. Product Tax */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("productTax")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.productTax || "Enable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("productTax", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 2. Racks */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("racks")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.racks || "Disable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("racks", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 3. Product Variants */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("productVariants")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.productVariants || "Enable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("productVariants", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 4. Product Expiry */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("productExpiry")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.productExpiry || "Disable"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("productExpiry", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Disable">{t("disable")}</SelectItem>
+                      <SelectItem value="Enable">{t("enable")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 5. Remove expired products from stock */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("removeExpired")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.removeExpired || "No, I will remove manually"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("removeExpired", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="No, I will remove manually">
+                        {t("removeExpiredManual")}
+                      </SelectItem>
+                      <SelectItem value="Yes, remove automatically">
+                        {t("removeExpiredAuto")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 6. Image Size (Width : Height) */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("imageSize")} <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <Input
+                      type="number"
+                      min={1}
+                      value={formData.imageWidth ?? 800}
+                      onChange={(e) => handleChange("imageWidth", Number(e.target.value))}
+                      placeholder="800"
+                      required
+                      className="text-xs sm:text-[13px] h-9.5 font-normal"
+                    />
+                    <Input
+                      type="number"
+                      min={1}
+                      value={formData.imageHeight ?? 800}
+                      onChange={(e) => handleChange("imageHeight", Number(e.target.value))}
+                      placeholder="800"
+                      required
+                      className="text-xs sm:text-[13px] h-9.5 font-normal"
+                    />
+                  </div>
+                </div>
+
+                {/* 7. Thumbnail Size (Width : Height) */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("thumbnailSize")} <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <Input
+                      type="number"
+                      min={1}
+                      value={formData.thumbnailWidth ?? 150}
+                      onChange={(e) => handleChange("thumbnailWidth", Number(e.target.value))}
+                      placeholder="150"
+                      required
+                      className="text-xs sm:text-[13px] h-9.5 font-normal"
+                    />
+                    <Input
+                      type="number"
+                      min={1}
+                      value={formData.thumbnailHeight ?? 150}
+                      onChange={(e) => handleChange("thumbnailHeight", Number(e.target.value))}
+                      placeholder="150"
+                      required
+                      className="text-xs sm:text-[13px] h-9.5 font-normal"
+                    />
+                  </div>
+                </div>
+
+                {/* 8. Watermark */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("watermark")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.watermark || "Yes"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("watermark", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Yes">{t("yes")}</SelectItem>
+                      <SelectItem value="No">{t("no")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 9. Display warehouse products */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("displayWarehouseProducts")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.displayWarehouseProducts || "Hide with 0 quantity"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("displayWarehouseProducts", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Hide with 0 quantity">
+                        {t("hideWithZero")}
+                      </SelectItem>
+                      <SelectItem value="Show with 0 quantity">
+                        {t("showWithZero")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 10. Barcode separator */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("barcodeSeparator")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.barcodeSeparator || "Dot (.)"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("barcodeSeparator", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Dot (.)">{t("barcodeSeparatorDot")}</SelectItem>
+                      <SelectItem value="Hyphen (-)">{t("barcodeSeparatorHyphen")}</SelectItem>
+                      <SelectItem value="Underscore (_)">{t("barcodeSeparatorUnderscore")}</SelectItem>
+                      <SelectItem value="Slash (/)">{t("barcodeSeparatorSlash")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 11. Barcode Renderer */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("barcodeRenderer")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.barcodeRenderer || "Image"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("barcodeRenderer", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Image">{t("barcodeRendererImage")}</SelectItem>
+                      <SelectItem value="SVG">{t("barcodeRendererSvg")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* 12. Update cost with purchase */}
+                <div className="space-y-1.5">
+                  <Label className="text-xs sm:text-[13px] font-normal text-foreground">
+                    {t("updateCostWithPurchase")} <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={formData.updateCostWithPurchase || "No"}
+                    onValueChange={(val) => {
+                      if (val) handleDropdownChange("updateCostWithPurchase", val);
+                    }}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="No">{t("no")}</SelectItem>
+                      <SelectItem value="Yes">{t("yes")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Next Module Tab Indicator (as shown in reference ERP mock) */}
+            <div className="flex items-center pt-3">
+              <div className="px-4 py-1 text-xs text-muted-foreground/60 border border-border/40 rounded-t-md bg-muted/20 select-none">
+                Sales
+              </div>
             </div>
           </div>
 
