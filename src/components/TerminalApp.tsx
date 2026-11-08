@@ -27,9 +27,10 @@ import {
 
 interface TerminalAppProps {
   initialView?: "dashboard" | "settings";
+  settingsTab?: string;
 }
 
-export function TerminalApp({ initialView }: TerminalAppProps) {
+export function TerminalApp({ initialView, settingsTab }: TerminalAppProps) {
   const t = useTranslations("auth");
   const { user, isLoading, isSubmitting, error, login } = useAuth();
 
@@ -101,7 +102,7 @@ export function TerminalApp({ initialView }: TerminalAppProps) {
 
   // Stable Dashboard View (no morphing underway)
   if (displayedView === "dashboard" && !isMorphing && user) {
-    return <DashboardLayout initialView={initialView} />;
+    return <DashboardLayout initialView={initialView} settingsTab={settingsTab} />;
   }
 
   // Morphing Container or Login View
@@ -134,7 +135,7 @@ export function TerminalApp({ initialView }: TerminalAppProps) {
               ${isMorphing ? "opacity-90 animate-in fade-in duration-500" : "opacity-100"}
             `}
           >
-            <DashboardLayout initialView={initialView} />
+            <DashboardLayout initialView={initialView} settingsTab={settingsTab} />
           </div>
         ) : (
           /* Login Card View */

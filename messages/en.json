@@ -56,6 +56,28 @@
     "collapse": "Collapse sidebar",
     "closeMenu": "Close menu"
   },
+  "settingsMenu": {
+    "systemSettings": "System Settings",
+    "posSettings": "POS Settings",
+    "categories": "Categories",
+    "branches": "Branches",
+    "units": "Units",
+    "expenseCategories": "Expense Categories",
+    "warehouses": "Warehouses",
+    "accessSetup": "Access Setup",
+    "taxRates": "Tax Rates",
+    "changeLogo": "Change Logo",
+    "promos": "Promos",
+    "listPrinters": "List Printers",
+    "addPrinter": "Add Printer",
+    "currencies": "Currencies",
+    "customerGroups": "Customer Groups",
+    "priceGroups": "Price Groups",
+    "variants": "Variants",
+    "emailTemplates": "Email Templates",
+    "siteLogs": "Site Logs",
+    "backups": "Backups"
+  },
   "topbar": {
     "terminal": "Terminal #01",
     "profile": "Profile",

@@ -56,6 +56,28 @@
     "collapse": "সাইডবার ছোট করুন",
     "closeMenu": "মেনু বন্ধ করুন"
   },
+  "settingsMenu": {
+    "systemSettings": "সিস্টেম সেটিংস",
+    "posSettings": "পিওএস সেটিংস",
+    "categories": "ক্যাটাগরি",
+    "branches": "ব্রাঞ্চ ও শাখা",
+    "units": "পরিমাপের একক",
+    "expenseCategories": "ব্যয়ের খাত",
+    "warehouses": "ওয়্যারহাউস ও গুদাম",
+    "accessSetup": "অ্যাক্সেস সেটআপ",
+    "taxRates": "ভ্যাট ও ট্যাক্স হার",
+    "changeLogo": "লোগো পরিবর্তন",
+    "promos": "প্রোমো ও অফার",
+    "listPrinters": "প্রিন্টারের তালিকা",
+    "addPrinter": "প্রিন্টার যুক্ত করুন",
+    "currencies": "মুদ্রা ও কারেন্সি",
+    "customerGroups": "গ্রাহক গ্রুপ",
+    "priceGroups": "মূল্য গ্রুপ",
+    "variants": "ভ্যারিয়েন্ট",
+    "emailTemplates": "ইমেইল টেমপ্লেট",
+    "siteLogs": "সাইট লগ",
+    "backups": "ব্যাকআপ ও রিকভারি"
+  },
   "topbar": {
     "terminal": "টার্মিনাল ০১",
     "profile": "প্রোফাইল",
