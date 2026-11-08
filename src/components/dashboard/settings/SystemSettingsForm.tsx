@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export function SystemSettingsForm() {
-  const t = useTranslations("settingsMenu");
+  const t = useTranslations("systemSettings");
   const currentLocale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -64,11 +64,7 @@ export function SystemSettingsForm() {
       const updated = await updateSettings(payload);
       setFormData(updated);
 
-      toast.success(
-        currentLocale === "bn"
-          ? "সিস্টেম সেটিংস সফলভাবে সংরক্ষিত হয়েছে।"
-          : "System settings updated successfully."
-      );
+      toast.success(t("successMessage"));
 
       // Dynamically apply selected Language locale across the site
       const targetLocale =
@@ -85,7 +81,7 @@ export function SystemSettingsForm() {
         router.replace(pathname, { locale: targetLocale });
       }
     } catch (err: any) {
-      toast.error(err.message || "Failed to update settings. Please try again.");
+      toast.error(err.message || t("errorMessage"));
     } finally {
       setIsSaving(false);
     }
@@ -96,7 +92,7 @@ export function SystemSettingsForm() {
       <Card className="w-full border-border bg-card p-10 flex flex-col items-center justify-center space-y-3">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         <p className="text-xs text-muted-foreground font-normal">
-          Loading system settings...
+          {t("loading")}
         </p>
       </Card>
     );
@@ -106,15 +102,17 @@ export function SystemSettingsForm() {
   const selectClassName =
     "h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-xs text-foreground font-normal outline-none transition-colors focus:border-ring focus:ring-1 focus:ring-ring cursor-pointer";
 
+  const isBn = currentLocale === "bn";
+
   return (
     <div className="w-full space-y-6">
       {/* Section Header - Clean with no icon next to title */}
       <div className="pb-3 border-b border-border/50">
         <h1 className="text-xl sm:text-2xl font-normal text-foreground tracking-tight">
-          {t("systemSettings")}
+          {t("title")}
         </h1>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Configure global system parameters, accounting policies, localization, and station defaults.
+          {t("subtitle")}
         </p>
       </div>
 
@@ -125,13 +123,13 @@ export function SystemSettingsForm() {
             {/* 1. Site Name */}
             <div className="space-y-1.5">
               <Label htmlFor="siteName" className="text-xs font-normal text-foreground">
-                Site Name <span className="text-destructive">*</span>
+                {t("siteName")} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="siteName"
                 value={formData.siteName}
                 onChange={(e) => handleChange("siteName", e.target.value)}
-                placeholder="e.g. Sunshine IT"
+                placeholder={t("siteNamePlaceholder")}
                 required
                 className="text-xs h-9 font-normal"
               />
@@ -140,7 +138,7 @@ export function SystemSettingsForm() {
             {/* 2. Language (English & Bengali only) */}
             <div className="space-y-1.5">
               <Label htmlFor="language" className="text-xs font-normal text-foreground">
-                Language <span className="text-destructive">*</span>
+                {t("language")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="language"
@@ -149,14 +147,14 @@ export function SystemSettingsForm() {
                 className={selectClassName}
               >
                 <option value="English">English</option>
-                <option value="Bengali">Bengali (বাংলা)</option>
+                <option value="Bengali">{isBn ? "বাংলা (Bengali)" : "Bengali (বাংলা)"}</option>
               </select>
             </div>
 
             {/* 3. Default Currency */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultCurrency" className="text-xs font-normal text-foreground">
-                Default Currency <span className="text-destructive">*</span>
+                {t("defaultCurrency")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="defaultCurrency"
@@ -164,20 +162,20 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("defaultCurrency", e.target.value)}
                 className={selectClassName}
               >
-                <option value="BDT">BDT (৳ - Bangladeshi Taka)</option>
-                <option value="USD">USD ($ - US Dollar)</option>
-                <option value="EUR">EUR (€ - Euro)</option>
-                <option value="GBP">GBP (£ - British Pound)</option>
-                <option value="INR">INR (₹ - Indian Rupee)</option>
-                <option value="SAR">SAR (﷼ - Saudi Riyal)</option>
-                <option value="AED">AED (د.إ - UAE Dirham)</option>
+                <option value="BDT">{isBn ? "বিডিটি (৳ - বাংলাদেশি টাকা)" : "BDT (৳ - Bangladeshi Taka)"}</option>
+                <option value="USD">{isBn ? "ইউএসডি ($ - মার্কিন ডলার)" : "USD ($ - US Dollar)"}</option>
+                <option value="EUR">{isBn ? "ইউরো (€ - ইউরোপীয় ইউরো)" : "EUR (€ - Euro)"}</option>
+                <option value="GBP">{isBn ? "জিবিপি (£ - ব্রিটিশ পাউন্ড)" : "GBP (£ - British Pound)"}</option>
+                <option value="INR">{isBn ? "আইএনআর (₹ - ভারতীয় রুপি)" : "INR (₹ - Indian Rupee)"}</option>
+                <option value="SAR">{isBn ? "এসএআর (﷼ - সৌদি রিয়াল)" : "SAR (﷼ - Saudi Riyal)"}</option>
+                <option value="AED">{isBn ? "এইডি (د.إ - আমিরাত দিরহাম)" : "AED (د.إ - UAE Dirham)"}</option>
               </select>
             </div>
 
             {/* 4. Accounting Method */}
             <div className="space-y-1.5">
               <Label htmlFor="accountingMethod" className="text-xs font-normal text-foreground">
-                Accounting Method <span className="text-destructive">*</span>
+                {t("accountingMethod")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="accountingMethod"
@@ -185,23 +183,29 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("accountingMethod", e.target.value)}
                 className={selectClassName}
               >
-                <option value="AVCO (Average Cost Method)">AVCO (Average Cost Method)</option>
-                <option value="FIFO (First In First Out)">FIFO (First In First Out)</option>
-                <option value="LIFO (Last In First Out)">LIFO (Last In First Out)</option>
+                <option value="AVCO (Average Cost Method)">
+                  {isBn ? "এভকো (AVCO - গড় খরচ পদ্ধতি)" : "AVCO (Average Cost Method)"}
+                </option>
+                <option value="FIFO (First In First Out)">
+                  {isBn ? "ফিফো (FIFO - আগে আসা পণ্য আগে বিক্রি)" : "FIFO (First In First Out)"}
+                </option>
+                <option value="LIFO (Last In First Out)">
+                  {isBn ? "লিফো (LIFO - পরে আসা পণ্য আগে বিক্রি)" : "LIFO (Last In First Out)"}
+                </option>
               </select>
             </div>
 
             {/* 5. Default Email */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultEmail" className="text-xs font-normal text-foreground">
-                Default Email <span className="text-destructive">*</span>
+                {t("defaultEmail")} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="defaultEmail"
                 type="email"
                 value={formData.defaultEmail}
                 onChange={(e) => handleChange("defaultEmail", e.target.value)}
-                placeholder="e.g. info@domain.com"
+                placeholder={t("defaultEmailPlaceholder")}
                 required
                 className="text-xs h-9 font-normal"
               />
@@ -210,7 +214,7 @@ export function SystemSettingsForm() {
             {/* 6. Default Customer Group */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultCustomerGroup" className="text-xs font-normal text-foreground">
-                Default Customer Group <span className="text-destructive">*</span>
+                {t("defaultCustomerGroup")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="defaultCustomerGroup"
@@ -218,17 +222,17 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("defaultCustomerGroup", e.target.value)}
                 className={selectClassName}
               >
-                <option value="General">General</option>
-                <option value="Retail">Retail</option>
-                <option value="Wholesale">Wholesale</option>
-                <option value="VIP">VIP</option>
+                <option value="General">{isBn ? "সাধারণ (General)" : "General"}</option>
+                <option value="Retail">{isBn ? "খুচরা (Retail)" : "Retail"}</option>
+                <option value="Wholesale">{isBn ? "পাইকারি (Wholesale)" : "Wholesale"}</option>
+                <option value="VIP">{isBn ? "ভিআইপি (VIP)" : "VIP"}</option>
               </select>
             </div>
 
             {/* 7. Default Price Group */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultPriceGroup" className="text-xs font-normal text-foreground">
-                Default Price Group <span className="text-destructive">*</span>
+                {t("defaultPriceGroup")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="defaultPriceGroup"
@@ -236,16 +240,16 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("defaultPriceGroup", e.target.value)}
                 className={selectClassName}
               >
-                <option value="Default">Default</option>
-                <option value="Retail Tier 1">Retail Tier 1</option>
-                <option value="Wholesale Tier 2">Wholesale Tier 2</option>
+                <option value="Default">{isBn ? "ডিফল্ট (Default)" : "Default"}</option>
+                <option value="Retail Tier 1">{isBn ? "খুচরা টায়ার ১ (Retail Tier 1)" : "Retail Tier 1"}</option>
+                <option value="Wholesale Tier 2">{isBn ? "পাইকারি টায়ার ২ (Wholesale Tier 2)" : "Wholesale Tier 2"}</option>
               </select>
             </div>
 
             {/* 8. Maintenance Mode */}
             <div className="space-y-1.5">
               <Label htmlFor="maintenanceMode" className="text-xs font-normal text-foreground">
-                Maintenance Mode <span className="text-destructive">*</span>
+                {t("maintenanceMode")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="maintenanceMode"
@@ -253,15 +257,15 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("maintenanceMode", e.target.value)}
                 className={selectClassName}
               >
-                <option value="No">No</option>
-                <option value="Yes">Yes</option>
+                <option value="No">{t("no")}</option>
+                <option value="Yes">{t("yes")}</option>
               </select>
             </div>
 
             {/* 9. Theme with Liquid Ripple Animation */}
             <div className="space-y-1.5">
               <Label htmlFor="theme" className="text-xs font-normal text-foreground">
-                Theme <span className="text-destructive">*</span>
+                {t("theme")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="theme"
@@ -277,16 +281,16 @@ export function SystemSettingsForm() {
                 }}
                 className={selectClassName}
               >
-                <option value="Default">Default</option>
-                <option value="Light">Light</option>
-                <option value="Dark">Dark</option>
+                <option value="Default">{t("themeDefault")}</option>
+                <option value="Light">{t("themeLight")}</option>
+                <option value="Dark">{t("themeDark")}</option>
               </select>
             </div>
 
             {/* 10. RTL Support */}
             <div className="space-y-1.5">
               <Label htmlFor="rtlSupport" className="text-xs font-normal text-foreground">
-                RTL Support <span className="text-destructive">*</span>
+                {t("rtlSupport")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="rtlSupport"
@@ -294,15 +298,15 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("rtlSupport", e.target.value)}
                 className={selectClassName}
               >
-                <option value="Disable">Disable</option>
-                <option value="Enable">Enable</option>
+                <option value="Disable">{t("disable")}</option>
+                <option value="Enable">{t("enable")}</option>
               </select>
             </div>
 
             {/* 11. Login Captcha */}
             <div className="space-y-1.5">
               <Label htmlFor="loginCaptcha" className="text-xs font-normal text-foreground">
-                Login Captcha <span className="text-destructive">*</span>
+                {t("loginCaptcha")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="loginCaptcha"
@@ -310,15 +314,15 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("loginCaptcha", e.target.value)}
                 className={selectClassName}
               >
-                <option value="Disable">Disable</option>
-                <option value="Enable">Enable</option>
+                <option value="Disable">{t("disable")}</option>
+                <option value="Enable">{t("enable")}</option>
               </select>
             </div>
 
             {/* 12. Number of days to disable editing */}
             <div className="space-y-1.5">
               <Label htmlFor="numberDaysDisableEditing" className="text-xs font-normal text-foreground">
-                Number of days to disable editing <span className="text-destructive">*</span>
+                {t("numberDaysDisableEditing")} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="numberDaysDisableEditing"
@@ -334,7 +338,7 @@ export function SystemSettingsForm() {
             {/* 13. Rows per page */}
             <div className="space-y-1.5">
               <Label htmlFor="rowsPerPage" className="text-xs font-normal text-foreground">
-                Rows per page <span className="text-destructive">*</span>
+                {t("rowsPerPage")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="rowsPerPage"
@@ -352,7 +356,7 @@ export function SystemSettingsForm() {
             {/* 14. Date Format */}
             <div className="space-y-1.5">
               <Label htmlFor="dateFormat" className="text-xs font-normal text-foreground">
-                Date Format <span className="text-destructive">*</span>
+                {t("dateFormat")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="dateFormat"
@@ -360,17 +364,17 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("dateFormat", e.target.value)}
                 className={selectClassName}
               >
-                <option value="dd-mm-yyyy">dd-mm-yyyy (e.g. 08-11-2026)</option>
-                <option value="yyyy-mm-dd">yyyy-mm-dd (e.g. 2026-11-08)</option>
-                <option value="mm-dd-yyyy">mm-dd-yyyy (e.g. 11-08-2026)</option>
-                <option value="dd/mm/yyyy">dd/mm/yyyy (e.g. 08/11/2026)</option>
+                <option value="dd-mm-yyyy">dd-mm-yyyy (08-11-2026)</option>
+                <option value="yyyy-mm-dd">yyyy-mm-dd (2026-11-08)</option>
+                <option value="mm-dd-yyyy">mm-dd-yyyy (11-08-2026)</option>
+                <option value="dd/mm/yyyy">dd/mm/yyyy (08/11/2026)</option>
               </select>
             </div>
 
             {/* 15. Timezone */}
             <div className="space-y-1.5">
               <Label htmlFor="timezone" className="text-xs font-normal text-foreground">
-                Timezone <span className="text-destructive">*</span>
+                {t("timezone")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="timezone"
@@ -391,7 +395,7 @@ export function SystemSettingsForm() {
             {/* 16. Calender */}
             <div className="space-y-1.5">
               <Label htmlFor="calender" className="text-xs font-normal text-foreground">
-                Calender <span className="text-destructive">*</span>
+                {t("calender")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="calender"
@@ -399,15 +403,15 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("calender", e.target.value)}
                 className={selectClassName}
               >
-                <option value="Shared">Shared</option>
-                <option value="Private">Private</option>
+                <option value="Shared">{t("shared")}</option>
+                <option value="Private">{t("private")}</option>
               </select>
             </div>
 
             {/* 17. Default Warehouse */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultWarehouse" className="text-xs font-normal text-foreground">
-                Default Warehouse <span className="text-destructive">*</span>
+                {t("defaultWarehouse")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="defaultWarehouse"
@@ -416,21 +420,21 @@ export function SystemSettingsForm() {
                 className={selectClassName}
               >
                 <option value="Uth (1)">Uth (1)</option>
-                <option value="Central Warehouse">Central Warehouse</option>
-                <option value="Outlet 1 Stock">Outlet 1 Stock</option>
+                <option value="Central Warehouse">{isBn ? "সেন্ট্রাল ওয়্যারহাউস" : "Central Warehouse"}</option>
+                <option value="Outlet 1 Stock">{isBn ? "আউটলেট ১ স্টক" : "Outlet 1 Stock"}</option>
               </select>
             </div>
 
             {/* 18. Default Biller */}
             <div className="space-y-1.5">
               <Label htmlFor="defaultBiller" className="text-xs font-normal text-foreground">
-                Default Biller <span className="text-destructive">*</span>
+                {t("defaultBiller")} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="defaultBiller"
                 value={formData.defaultBiller}
                 onChange={(e) => handleChange("defaultBiller", e.target.value)}
-                placeholder="e.g. Sunshine IT"
+                placeholder={t("defaultBillerPlaceholder")}
                 required
                 className="text-xs h-9 font-normal"
               />
@@ -439,7 +443,7 @@ export function SystemSettingsForm() {
             {/* 19. PDF Library */}
             <div className="space-y-1.5">
               <Label htmlFor="pdfLibrary" className="text-xs font-normal text-foreground">
-                PDF Library <span className="text-destructive">*</span>
+                {t("pdfLibrary")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="pdfLibrary"
@@ -456,7 +460,7 @@ export function SystemSettingsForm() {
             {/* 20. Use code for slug */}
             <div className="space-y-1.5">
               <Label htmlFor="useCodeForSlug" className="text-xs font-normal text-foreground">
-                Use code for slug <span className="text-destructive">*</span>
+                {t("useCodeForSlug")} <span className="text-destructive">*</span>
               </Label>
               <select
                 id="useCodeForSlug"
@@ -464,8 +468,8 @@ export function SystemSettingsForm() {
                 onChange={(e) => handleChange("useCodeForSlug", e.target.value)}
                 className={selectClassName}
               >
-                <option value="Enable">Enable</option>
-                <option value="Disable">Disable</option>
+                <option value="Enable">{t("enable")}</option>
+                <option value="Disable">{t("disable")}</option>
               </select>
             </div>
           </div>
@@ -473,7 +477,7 @@ export function SystemSettingsForm() {
           {/* Action Footer */}
           <div className="pt-4 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground font-normal">
-              * Required system parameters will immediately affect store calculations, branding, and invoices across the entire website.
+              {t("notice")}
             </p>
 
             <div className="flex items-center gap-2.5 w-full sm:w-auto">
@@ -485,12 +489,12 @@ export function SystemSettingsForm() {
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Updating Settings...</span>
+                    <span>{t("updatingButton")}</span>
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4" />
-                    <span>Update Settings</span>
+                    <span>{t("updateButton")}</span>
                   </>
                 )}
               </Button>
