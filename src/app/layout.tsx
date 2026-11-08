@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Poppins, Hind_Siliguri } from "next/font/google";
+import { Poppins } from "next/font/google";
+import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import "./globals.css";
@@ -11,9 +12,29 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const hindSiliguri = Hind_Siliguri({
-  weight: ["300", "400", "500", "600", "700"],
-  subsets: ["bengali", "latin"],
+const liAdorNoirrit = localFont({
+  src: [
+    {
+      path: "../fonts/LiAdorNoirrit-Light.ttf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../fonts/LiAdorNoirrit-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/LiAdorNoirrit-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../fonts/LiAdorNoirrit-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-bengali",
   display: "swap",
 });
@@ -31,7 +52,7 @@ export default function RootLayout({
   return (
     <html
       suppressHydrationWarning
-      className={`${poppins.variable} ${hindSiliguri.variable}`}
+      className={`${poppins.variable} ${liAdorNoirrit.variable}`}
     >
       <body
         suppressHydrationWarning
