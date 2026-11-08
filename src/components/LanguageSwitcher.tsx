@@ -14,6 +14,9 @@ export function LanguageSwitcher() {
 
   const toggleLanguage = () => {
     const nextLocale = locale === "en" ? "bn" : "en";
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = nextLocale;
+    }
     startTransition(() => {
       router.replace(pathname, { locale: nextLocale });
     });
@@ -28,7 +31,7 @@ export function LanguageSwitcher() {
       disabled={isPending}
       aria-label="Switch language"
     >
-      <Languages className={`h-3.5 w-3.5 transition-transform ${isPending ? "opacity-50" : ""}`} />
+      <Languages className={`h-3.5 w-3.5 transition-opacity ${isPending ? "opacity-50" : ""}`} />
       <span>{locale === "en" ? "বাংলা" : "English"}</span>
     </Button>
   );
