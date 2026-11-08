@@ -3,6 +3,7 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
+import { SystemSettingsForm } from "./settings/SystemSettingsForm";
 import {
   Card,
   CardHeader,
@@ -43,7 +44,6 @@ import {
   Mail,
   FileCode,
   DatabaseBackup,
-  Upload,
   Download,
 } from "lucide-react";
 
@@ -61,10 +61,10 @@ export function DashboardContent({
   const tSettings = useTranslations("settingsMenu");
   const { user } = useAuth();
 
-  // 1. DASHBOARD OVERVIEW VIEW
+  // 1. DASHBOARD OVERVIEW VIEW (Full Width)
   if (activeView === "dashboard") {
     return (
-      <div className="w-full max-w-5xl mx-auto space-y-6">
+      <div className="w-full space-y-6">
         {/* Welcome Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-border/50">
           <div>
@@ -83,7 +83,7 @@ export function DashboardContent({
         </div>
 
         {/* 4 Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
           <Card className="border-border bg-card p-4 space-y-2 shadow-xs">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground font-normal">
@@ -154,12 +154,12 @@ export function DashboardContent({
         </div>
 
         {/* Quick Action Shortcuts */}
-        <div className="space-y-3">
+        <div className="space-y-3 w-full">
           <h2 className="text-sm font-normal text-foreground">
             {t("quickActions")}
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
             <Button
               variant="outline"
               className="h-20 flex-col gap-2 rounded-xl border-border bg-card hover:bg-muted/60 text-foreground cursor-pointer font-normal text-xs"
@@ -195,7 +195,7 @@ export function DashboardContent({
         </div>
 
         {/* Shift Status */}
-        <Card className="border-border bg-card p-4 sm:p-5 shadow-xs space-y-3">
+        <Card className="border-border bg-card p-4 sm:p-5 shadow-xs space-y-3 w-full">
           <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -206,7 +206,7 @@ export function DashboardContent({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs w-full">
             <div className="rounded-lg bg-muted/40 p-3 space-y-1">
               <span className="text-muted-foreground">Cashier On Duty</span>
               <p className="text-foreground font-normal text-sm">{user?.name}</p>
@@ -225,7 +225,12 @@ export function DashboardContent({
     );
   }
 
-  // 2. SETTINGS SUBMENU VIEWS (Tailored for whichever of the 20 subitems is active)
+  // 2. SETTINGS VIEW: If "system-settings" is active, render the dedicated SystemSettingsForm!
+  if (!activeSubTab || activeSubTab === "system-settings") {
+    return <SystemSettingsForm />;
+  }
+
+  // 3. OTHER SETTINGS SUBMENUS
   const getSubTabDetails = () => {
     switch (activeSubTab) {
       case "pos-settings":
@@ -355,7 +360,7 @@ export function DashboardContent({
   const TabIcon = currentTab.icon;
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       {/* Submenu Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-border/50">
         <div className="flex items-center gap-3">
@@ -379,7 +384,7 @@ export function DashboardContent({
       </div>
 
       {/* Main Settings Panel Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
         {/* Card 1: Configuration Status */}
         <Card className="border-border bg-card p-4 sm:p-5 space-y-3 shadow-xs">
           <div className="flex items-center gap-2.5">
@@ -450,7 +455,7 @@ export function DashboardContent({
         </Card>
 
         {/* Card 4: Action Controls tailored to current tab */}
-        <Card className="border-border bg-card p-4 sm:p-5 space-y-3 shadow-xs sm:col-span-2 lg:col-span-3">
+        <Card className="border-border bg-card p-4 sm:p-5 space-y-3 shadow-xs sm:col-span-2 lg:col-span-3 w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/50 pb-3">
             <div>
               <CardTitle className="text-sm font-normal">Manage {currentTab.title}</CardTitle>
