@@ -19,7 +19,7 @@ export function Topbar({ onOpenMobileMenu, activeItemTitle }: TopbarProps) {
   return (
     <header className="sticky top-0 z-20 h-14 w-full bg-background/85 backdrop-blur-md border-b border-border/80 flex items-center justify-between px-3 sm:px-5 select-none transition-colors">
       {/* Left Section: Mobile Menu Trigger + Clean Page/Section Title */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
         {/* Mobile Hamburger Drawer Trigger */}
         <Button
           variant="ghost"
@@ -31,17 +31,10 @@ export function Topbar({ onOpenMobileMenu, activeItemTitle }: TopbarProps) {
           <Menu className="h-4 w-4" />
         </Button>
 
-        {/* Live Status indicator + Clean Location Title (No confusing 'Terminal' wording) */}
-        <div className="flex items-center gap-2">
-          <span className="flex h-2 w-2 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-
-          <span className="text-xs font-normal text-foreground">
-            {activeItemTitle || t("title")}
-          </span>
-        </div>
+        {/* Clean Location Title without any pulse/dot */}
+        <span className="text-xs font-normal text-foreground">
+          {activeItemTitle || t("title")}
+        </span>
       </div>
 
       {/* Right Section: Language, Theme, and Profile Dropdown */}
