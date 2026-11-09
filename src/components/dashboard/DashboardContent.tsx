@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/useAuth";
 import { useSettings } from "@/hooks/useSettings";
 import { SystemSettingsForm } from "./settings/SystemSettingsForm";
+import { PosSettingsForm } from "./settings/PosSettingsForm";
 import {
   Card,
   CardHeader,
@@ -244,6 +245,11 @@ export function DashboardContent({
   // 2. SETTINGS VIEW: If "system-settings" is active, render the dedicated SystemSettingsForm!
   if (!activeSubTab || activeSubTab === "system-settings") {
     return <SystemSettingsForm />;
+  }
+
+  // If "pos-settings" is active, render the dedicated PosSettingsForm!
+  if (activeSubTab === "pos-settings") {
+    return <PosSettingsForm />;
   }
 
   // 3. OTHER SETTINGS SUBMENUS
